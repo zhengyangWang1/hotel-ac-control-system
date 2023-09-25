@@ -2,9 +2,9 @@
 ### SE小组作业
 
 #### TODO
-- [ ] 学习各自的内容（前端、后端、数据库）
+- [ ] 学习Django中 课程： https://www.bilibili.com/video/BV1rT4y1v7uQ?p=42&spm_id_from=pageDriver&vd_source=7d4ddbfe6a66f2fbe94075935b693c57
 - [ ] 学习用Git上传代码 可视化Git学习网站：https://learngitbranching.js.org/?locale=zh_CN
-- [ ] 使用Git创建各自的branch，建立远程仓库与本地的连接
+- [ x ] 使用Git创建各自的branch，建立远程仓库与本地的连接
 
 #### 工程架构
 前端：Vue  @er wang

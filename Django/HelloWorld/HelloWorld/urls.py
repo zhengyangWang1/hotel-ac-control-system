@@ -30,5 +30,7 @@ urlpatterns = [
     # path('hello/', views.hello),
 
     # www.xxx.com/index/
-    path('something/', views.something)
+    path('something/', views.something),
+
+    path('login/', views.login),
 ]

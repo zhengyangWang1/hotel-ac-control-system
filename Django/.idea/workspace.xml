@@ -4,15 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4532c09c-6ddf-4503-9333-de84b1c13854" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/HelloWorld/app1/templates/login.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/HelloWorld/app1/templates/something.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Django.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Django.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HelloWorld/HelloWorld/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/HelloWorld/HelloWorld/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HelloWorld/HelloWorld/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/HelloWorld/HelloWorld/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HelloWorld/app1/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/HelloWorld/app1/views.py" afterDir="false" />
-    </list>
+    <list default="true" id="4532c09c-6ddf-4503-9333-de84b1c13854" name="更改" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,23 +29,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "wzy",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "D:/code/hotel-ac-control-system/Django/HelloWorld/HelloWorld/settings.py",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "settings.editor.selected.configurable": "com.jetbrains.django.DjangoModulesConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;wzy&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/code/hotel-ac-control-system/Django/HelloWorld/HelloWorld/settings.py&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.django.DjangoModulesConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="HelloWorld" type="Python.DjangoServer" factoryName="Django server">
       <module name="Django" />
@@ -92,6 +84,7 @@
       <workItem from="1695487569589" duration="100000" />
       <workItem from="1695539075224" duration="8418000" />
       <workItem from="1695621028019" duration="3828000" />
+      <workItem from="1695722162630" duration="38000" />
     </task>
     <servers />
   </component>

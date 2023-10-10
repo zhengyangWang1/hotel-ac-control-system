@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4532c09c-6ddf-4503-9333-de84b1c13854" name="更改" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Django.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Django.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HelloWorld/HelloWorld/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/HelloWorld/HelloWorld/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HelloWorld/app1/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/HelloWorld/app1/models.py" afterDir="false" />
-    </list>
+    <list default="true" id="4532c09c-6ddf-4503-9333-de84b1c13854" name="更改" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -97,6 +92,7 @@
       <workItem from="1696578689872" duration="225000" />
       <workItem from="1696852363896" duration="2589000" />
       <workItem from="1696863518496" duration="2821000" />
+      <workItem from="1696901504154" duration="717000" />
     </task>
     <servers />
   </component>

@@ -17,5 +17,5 @@
 
 ![image](https://github.com/zhengyangWang1/hotel-ac-control-system/assets/94629354/3737dfd6-842d-4a70-b48e-4a792a469add)
 
-
+![](https://cdn.jsdelivr.net/gh/zhengyangWang1/image@main/img/20231010102445.png)
 

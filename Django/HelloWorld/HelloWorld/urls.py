@@ -33,4 +33,6 @@ urlpatterns = [
     path('something/', views.something),
 
     path('login/', views.login),
+
+    path('add_user/', views.add_user),
 ]

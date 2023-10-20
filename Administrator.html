@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>酒店空调管理</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            background-image: url('ad.jpg'); /* 图像文件的路径 */
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .header {
+            background-color: #2d2e30;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: rgba(255, 255, 255, 0.7);;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .room-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .room-item {
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .room-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .room-number {
+            font-weight: bold;
+        }
+
+        .temperature-display {
+            font-weight: bold;
+        }
+
+        .ac-status {
+            margin-top: 10px;
+        }
+
+        .ac-status-info {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>波普特酒店空调管理</h1>
+    </div>
+    <div class="container">
+        <ul class="room-list">
+            <li class="room-item">
+                <div class="room-info">
+                    <span class="room-number">房间 101</span>
+                </div>
+                <div class="ac-status">
+                    <p class="ac-status-info">空调状态: 开启</p>
+                </div>
+                <div class="ac-status">
+                    <p class="ac-status-info">耗电量: 0.75 kWh</p>
+                </div>
+                <div class="ac-status">
+                    <p class="ac-status-info">风速: 中风</p>
+                </div>
+                <div class="temperature-control">
+                    <p class="ac-status-info">当前温度: 22°C</p>
+                </div>
+            </li>
+
+            <li class="room-item">
+                <div class="room-info">
+                    <span class="room-number">房间 102</span>
+                </div>
+                <div class="ac-status">
+                    <p class="ac-status-info">空调状态: 关闭</p>
+                </div>
+                <div class="ac-status">
+                    <p class="ac-status-info">耗电量: 0.0 kWh</p>
+                </div>
+                <div class="ac-status">
+                    <p class="ac-status-info">风速: 低风</p>
+                </div>
+                <div class="temperature-control">
+                    <p class="ac-status-info">当前温度: 25°C</p>
+                </div>
+            </li>
+
+            <!-- 在此添加更多房间信息 -->
+
+        </ul>
+    </div>
+</body>
+</html>

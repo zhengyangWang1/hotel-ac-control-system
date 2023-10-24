@@ -24,7 +24,8 @@ Including another URLconf
 from django.urls import path
 # from django.conf.urls import url 这段代码已经过时，上面的re_path取代了之前版本的url
 from app1 import views  # from app1 import是从Django/HelloWorld往下找
-                        # from ..app1 import是从当前文件位置
+
+# from ..app1 import是从当前文件位置
 
 urlpatterns = [
     # path('hello/', views.hello),
@@ -34,5 +35,8 @@ urlpatterns = [
 
     path('login/', views.login),
 
-    path('add_user/', views.add_user),
+    path('open_ac/', views.open_ac, name='open_ac'),
+
 ]
+
+# TODO:运行Django程序，验证函数可行性

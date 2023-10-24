@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>输入温度和风速</title>
+</head>
+<body>
+
+<h2>请输入温度和风速</h2>
+
+<form>
+   {% csrf_token %}
+   <label for="temp">温度:</label>
+   <input type="text" id="temp" name="temp"><br><br>
+   <label for="wind_speed">风速:</label>
+   <input type="text" id="wind_speed" name="wind_speed"><br><br>
+   <input type="submit" value="确认">
+</form>
+
+</body>
+</html>

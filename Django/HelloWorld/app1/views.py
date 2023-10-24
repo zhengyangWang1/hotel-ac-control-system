@@ -1,6 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from app1.models import User, Room
+from app1 import models
+import datetime
+
 
 # Create your views here.
 def something(request):
@@ -18,21 +20,51 @@ def something(request):
 
 
 def login(request):
-    if request.method == "GET":
-        return render(request, "login.html")
-    else:
-        # 如果是post请求，获取用户提交的数据
-        print(request.POST)
-        user = request.POST.get("user")
-        pwd = request.POST.get("pwd")
-        if user == 'wang' and pwd == "123":
-            return redirect("https://zhengyangwang1.github.io/")
-        else:
-            return render(request, "login.html", {'error_msg': '账号或密码有误，请重新登录！'})
+    return render(request, 'login.html')
 
 
-def add_user(request):
-    # User.objects.create(user_id='3314', user_name='wzy', user_age=20)
-    User.objects.create(user_id='1111', user_name='222', user_age=20)
+# 用户点击开机
+def open_ac(request):  # 把该房间信息添加到数据库
+    """获取request中的用户信息和空调数据"""
+    user_id = request.POST.get('user_id')
+    room_id = request.POST.get('room_id')
+    # temp = request.POST.get('temp')
+    # wind_speed = request.POST.get('wind_speed')
+    # 在AirCondition中添加一条空调信息，用户id和房间号由前端request传入，空调温度和风速为默认值
+    models.AirCondition.objects.create(user_id=user_id, room_id=room_id, temp=26, wind_speed=5)
+    # 在Room中添加一条操作信息，表明空调已经开启
+    models.Room.objects.create(room_id=room_id, user_id=user_id, temp=26, wind_speed=5,
+                               open_time=datetime.datetime.now())
+    return render(request, 'ac.html')
 
-    return HttpResponse('导入成功')
+
+# 用户点击关机
+def close_ac(request):
+    """把room对象从room_list中移除"""
+    user_id = request.POST.get('user_id')
+    room_id = request.POST.get('room_id')
+    temp = request.POST.get('temp')
+    wind_speed = request.POST.get('wind_speed')
+    # 将AirCondition中将该房间空调的信息删去
+    models.AirCondition.objects.filter(room_id=room_id).delete()
+    # 在Room中添加一条操作信息，表明空调已经关闭
+    models.Room.objects.create(room_id=room_id, user_id=user_id, temp=temp, wind_speed=wind_speed,
+                               close_time=datetime.datetime.now())
+    return render(request, '关机后显示已关机')
+
+
+# 用户设定好温度和风速后点击确定
+def change_temp_wind(request):
+    user_id = request.POST.get('user_id')
+    room_id = request.POST.get('room_id')
+    temp = request.POST.get('temp')
+    wind_speed = request.POST.get('wind_speed')
+    # 更改AirCondition中空调的参数
+    ac = models.AirCondition.objects.get(room_id=room_id)
+    ac.temp = temp
+    ac.wind_speed = wind_speed
+    ac.save()
+    # 在Room中添加一条操作，表明更改后的空调参数
+    models.Room.objects.create(room_id=room_id, user_id=user_id, temp=temp, wind_speed=wind_speed,
+                               change_time=datetime.datetime.now())
+    return render(request, '显示更改成功')

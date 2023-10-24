@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>输入用户ID和房间ID</title>
 </head>
 <body>
 
-<h1>用户登录</h1>
-<form method="post" action="/login/">
-    {% csrf_token %}
+<h2>请输入您的用户ID和房间ID</h2>
 
-    <input type="text" name="user" placeholder="用户名">
-    <input type="password" name="pwd" placeholder="密码">
-    <input type="submit" value="提交"/>
-    <p style="color:red">{{ error_msg }}</p>
+<form action="{% url 'open_ac' %}" method="post">
+   {% csrf_token %}
+   <label for="user_id">用户ID:</label>
+   <input type="text" id="user_id" name="user_id"><br><br>
+   <label for="room_id">房间ID:</label>
+   <input type="text" id="room_id" name="room_id"><br><br>
+   <input type="submit" value="确定">
 </form>
 
 </body>

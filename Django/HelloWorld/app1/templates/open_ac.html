@@ -1,0 +1,6 @@
+<form action="{% url 'open_ac' %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="user_id" value="{{ user_id }}">
+    <input type="hidden" name="room_id" value="{{ room_id }}">
+    <button type="submit">打开空调</button>
+</form>

@@ -1,0 +1,23 @@
+<table>
+    <thead>
+        <tr>
+            <th>open time</th>
+            <th>close time</th>
+            <th>temperature</th>
+            <th>wind speed</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in records %}
+        <tr>
+
+            <td>{{ record.open_time }}</td>
+            <td>{{ record.close_time }}</td>
+            <td>{{ record.temp }}</td>
+            <td>{{ record.wind_speed }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<p>Electricity Cost: {{ cost }}</p>

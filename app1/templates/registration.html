@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Details</title>
+</head>
+<body>
+    <h1>Registration Details</h1>
+    <table>
+        <tr>
+            <th>Room ID</th>
+            <th>Total Time</th>
+            <th>Total Cost</th>
+        </tr>
+        {% for detail in bill_details %}
+        <tr>
+            <td>{{ detail.room_id }}</td>
+            <td>{{ detail.total_time }}</td>
+            <td>{{ detail.total_cost }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

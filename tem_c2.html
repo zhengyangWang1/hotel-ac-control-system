@@ -1,12 +1,6 @@
 <!DOCTYPE html>
 <html>
-<!-- <head>
-    <meta charset="UTF-8">
-    <title>空调控制系统</title>
-    
-    <link rel="stylesheet" type="text/css" href="css/styles_tc.css">
 
-</head> -->
 <head>
     <meta charset="UTF-8">
     <title>空调控制系统</title>
@@ -24,20 +18,6 @@
             padding: 0;
         }
 
-        /* 其他样式，如控制面板的样式 */
-        /* .control-panel {
-            background-color: rgba(255, 255, 255, 0.7);
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            max-width: 600px;
-        } */
-
         h1 {
             font-size: 24px;
             margin-bottom: 20px;
@@ -51,8 +31,8 @@
 
         <div class="room-number">
             <h2>房间号</h2>
-         
-            <h2>XXX</h2>
+            <h2 id="displayRoomNumber"></h2>
+            <!-- <h2>XXX</h2> -->
         </div>
 
         <div class="ac-status">
@@ -98,6 +78,11 @@
                 <h2>费用</h2>
                 <span id="cost">$0.15</span>
             </div>
+
+        </div>
+
+        <div>
+            <input type="submit" value="退房">
         </div>
     </div>
 
@@ -175,6 +160,19 @@
             }
         }
        
+        // 当页面加载时执行此函数
+        document.addEventListener('DOMContentLoaded', function() {
+        // 从localStorage获取房间号
+        var roomNumber = localStorage.getItem('chosenRoomNumber');
+
+        // 如果存在房间号，则更新页面上的内容
+        if (roomNumber) {
+            document.querySelector('.room-number h2').textContent = roomNumber;
+        } else {
+            document.querySelector('.room-number h2').textContent = '未选择';
+        }
+        });
+
     </script>
     
 </body>

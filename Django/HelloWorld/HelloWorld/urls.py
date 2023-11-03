@@ -28,15 +28,10 @@ from app1 import views  # from app1 import是从Django/HelloWorld往下找
 # from ..app1 import是从当前文件位置
 
 urlpatterns = [
-    # path('hello/', views.hello),
-
-    # www.xxx.com/index/
-    path('something/', views.something),
-
+    path('', views.login, name='login'),  # 将根路径映射到登录页面
     path('login/', views.login),
+    path('register/', views.register, name='register')
 
-    path('open_ac/', views.open_ac, name='open_ac'),
 
 ]
 
-# TODO:运行Django程序，验证函数可行性

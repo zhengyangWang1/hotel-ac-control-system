@@ -5,18 +5,15 @@ import datetime
 
 
 # Create your views here.
-def something(request):
-    # 获取请求方式
-    print(request.method)
 
-    # 在URL上传递值
-    print(request.GET)
+def register(request):
+    if request.method == 'POST':
+        room_id = request.POST.get('roomNumber')
+        user_id = request.POST.get('username')
+        password = request.POST.get('password')
+        models.User.objects.create(user_id=user_id, room_id=room_id, password=password)
+        return render(request, 'login.html')
 
-    # 在请求体中提交数据
-    print(request.POST)
-
-    # return HttpResponse("返回内容")
-    return render(request, 'something.html')
 
 
 def login(request):
@@ -31,7 +28,7 @@ def open_ac(request):  # 把该房间信息添加到数据库
     # temp = request.POST.get('temp')
     # wind_speed = request.POST.get('wind_speed')
     # 在AirCondition中添加一条空调信息，用户id和房间号由前端request传入，空调温度和风速为默认值
-    models.AirCondition.objects.create(user_id=user_id, room_id=room_id, temp=26, wind_speed=5)
+    models.AirCondition.objects.create(user_id=user_id, room_id=room_id, temp=26, wind_speed=5)  # 待添加
     # 在Room中添加一条操作信息，表明空调已经开启
     models.Room.objects.create(room_id=room_id, user_id=user_id, temp=26, wind_speed=5,
                                open_time=datetime.datetime.now())

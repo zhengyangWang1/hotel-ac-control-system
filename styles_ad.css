@@ -1,12 +1,15 @@
 body {
-    background-color: #f5f5f5; /* 浅灰色背景 */
     font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
     margin: 0;
+    padding: 0;
+    background-image: url('ad.jpg'); /* 图像文件的路径 */
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
-header {
-    background-color: #003366; /* 深蓝色背景 */
-    /* background-color:linear-gradient(to right, #0074D9, #003366); */
+.header {
+    background-color: #2d2e30;
     color: #fff; /* 白色文字 */
     display: flex;
     justify-content: space-between;
@@ -17,7 +20,6 @@ header {
     font-family: Arial, sans-serif;
     font-size: 16px;
 }
-
 nav ul {
     list-style: none;
     display: flex;
@@ -32,84 +34,52 @@ nav a {
     color: #fff; /* 白色链接文字 */
 }
 
-.language select {
-
-    background-color: transparent;
-    border: none;
-    color: #fff; /* 白色文字 */
-    
-
-}
-
 .user-options a {
     text-decoration: none;
     color: #fff; /* 白色链接文字 */
 }
-
-.banner {
-    position: relative;
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: rgba(255, 255, 255, 0.7);;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.banner img {
-    width: 100%;
-    height: 200%;
-    opacity: 0.95;
+.room-list {
+    list-style: none;
+    padding: 0;
 }
 
-.welcome {
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: #fff; /* 白色文字 */
-    font-family:"Times New Roman"
-}
-
-.welcome h1 {
-    font-size: 50px;
-    margin-bottom: 10px;
-}
-
-.welcome p {
-    font-size: 30px;
-    margin-bottom: 20px;
-    
-}
-
-
-.submit_button {
-    background-color: #cc3333; 
-    color: #fff;
-    text-decoration: none;
-    padding: 10px 10px;
-    border-radius: 5px;
-}
-
-
-
-.select {
-    background-color: #c3c5f0;
-    color: #171313;
-    font-family: Arial, sans-serif;
-    font-size: 16px;
+.room-item {
+    background-color: #f9f9f9;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 8px;
-  }
-
- 
-.ac-status {
-    margin-top: 20px;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
 }
 
-.ac-status button {
-    padding: 10px 20px;
-    background-color: #007BFF;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+.room-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.room-number {
+    font-weight: bold;
+}
+
+.temperature-display {
+    font-weight: bold;
+}
+
+.ac-status {
+    margin-top: 10px;
+}
+
+.ac-status-info {
+    font-weight: bold;
 }
 
 
@@ -185,7 +155,7 @@ nav a {
   }
   
   button {
-    background-color: #003366;
+    background-color:  #2d2e30;
     color: #fff;
     border: none;
     padding: 10px;
@@ -194,6 +164,30 @@ nav a {
   }
   
   button:hover {
-    background-color: #003366;
+    background-color: #2d2e30;
   }
   
+
+  
+
+.welcome {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color:#2d2e30; /* 白色文字 */
+    font-family:"Times New Roman"
+}
+
+.welcome h1 {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+.welcome p {
+    font-size: 30px;
+    margin-bottom: 20px;
+    
+}
+

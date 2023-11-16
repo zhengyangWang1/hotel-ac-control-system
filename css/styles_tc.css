@@ -1,3 +1,6 @@
+
+
+
 body {
     background-color: #f0f0f0;
     font-family: Arial, sans-serif;
@@ -5,10 +8,8 @@ body {
     margin: 0;
     padding: 0;
    
-  
-   
-   
 }
+
 
 /* .control-panel {
     background-color: #fff;
@@ -83,4 +84,42 @@ select {
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
+}
+
+
+.header{
+    background-color:#333;
+
+}
+.container{
+    width: 1500px;;
+    
+    margin: 0 auto;
+}
+.Poput_Hotel{
+    float:left;
+    color: white;
+    height: 60px;
+    line-height: 60px;
+    margin-right: 450px;
+}
+.menu{
+    float:left;
+    color: white;
+    height: 60px;
+    line-height: 60px;
+    margin-right: 20px;
+}
+.account{
+    float:right;
+    color: white;
+    height: 60px;
+    line-height: 60px;
+}
+.header  a{
+    color:#b0b0b0;
+    line-height:60px;
+    display:inline-block;
+    font-size:16px;
+    margin-right: 5px;
 }

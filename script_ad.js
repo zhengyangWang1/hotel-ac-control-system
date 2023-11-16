@@ -6,22 +6,22 @@ function closeRegisterForm() {
     document.getElementById('registerForm').style.display = 'none';
     }
 
-function showEnterRoomForm(){
-    document.getElementById('enterRoomFrom').style.display = 'block';
+function showloginForm(){
+    document.getElementById('loginFrom').style.display = 'block';
 }
 
-function closeEnterRoomForm() {
-    document.getElementById('enterRoomFrom').style.display = 'none';
+function closeloginForm() {
+    document.getElementById('loginFrom').style.display = 'none';
     }
 
-function enterRoom() {
+function login() {
 
-    var roomNumber = document.getElementById('roomNumber1').value;
+    var identity = document.getElementById('identity1').value;
     var username = document.getElementById('username1').value;
     var password = document.getElementById('password1').value;
 
-    if (!roomNumber) {
-        alert('请选择一个房间号。');
+    if (!identity) {
+        alert('请选择身份。');
         return false;
     }
     if (!username) {
@@ -42,14 +42,14 @@ function enterRoom() {
 
 
 function submitForm() {
-    var roomNumber = document.getElementById('roomNumber').value;
+    var identity = document.getElementById('identity').value;
     var username = document.getElementById('username').value;
     var password = document.getElementById('password').value;
     var confirmPassword = document.getElementById('confirmPassword').value;
 
     // 检查是否选择了房间
-    if (!roomNumber) {
-        alert('请选择房间号。');
+    if (!identity) {
+        alert('请选择身份');
         return false;
     }
 
@@ -78,7 +78,7 @@ function submitForm() {
     }
     
     // 所有检查通过后
-    alert('入住信息已提交！');
+    alert('注册信息已提交！');
     // 这里应该是发送数据到服务器的代码
     // 例如使用 AJAX 或者将表单数据提交到一个服务器端脚本
 

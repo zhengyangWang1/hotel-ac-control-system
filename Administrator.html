@@ -2,75 +2,98 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>酒店空调管理</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-            background-image: url('ad.jpg'); /* 图像文件的路径 */
-            background-repeat: no-repeat;
-            background-size: cover;
-        }
+    <title>波普特酒店空调管理</title>
+    <link rel="stylesheet" type="text/css" href="styles_ad.css">
 
-        .header {
-            background-color: #2d2e30;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            background-color: rgba(255, 255, 255, 0.7);;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .room-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .room-item {
-            background-color: #f9f9f9;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            margin: 10px 0;
-        }
-
-        .room-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .room-number {
-            font-weight: bold;
-        }
-
-        .temperature-display {
-            font-weight: bold;
-        }
-
-        .ac-status {
-            margin-top: 10px;
-        }
-
-        .ac-status-info {
-            font-weight: bold;
-        }
-    </style>
+    
 </head>
 <body>
     <div class="header">
-        <h1>波普特酒店空调管理</h1>
+        <div class="logo">
+            <p>Poput Hotel</p>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">首页</a></li>
+                <li><a href="#">客房</a></li>
+                <li><a href="#">餐厅</a></li>
+                <li><a href="#">联系我们</a></li>
+            </ul>
+        </nav>
+
+        <div class="user-options">
+            <a href="#" onclick="showloginForm()">登录</a> | 
+            <a href="#" onclick="showRegisterForm()">注册</a> | 
+        </div>
+
+        <div id="registerForm" class="modal">
+            <div class="modal-content">
+              <span class="close" onclick="closeRegisterForm()">&times;</span>
+              <h2>注册</h2>
+              <form id="checkInForm" >
+                <label for="identity">选择身份:</label>
+                <select id="identity" name="identity">
+                  <option value="air_service">空调管理员</option>
+                  <option value="front_service">前台服务</option>
+                </select>
+                <br>
+                <label for="username">用户名:</label>
+                <input type="text" id="username" name="username" required>
+                <br>
+                <label for="password">密码:</label>
+                <input type="password" id="password" name="password" required>
+                <br>
+                <label for="confirmPassword">确认密码:</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+                <br>
+                <button type="submit" onclick="submitForm()">注册</button>
+           
+              </form>
+            </div>
+          </div>
+
+
+          <div id="loginFrom" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeloginForm()">&times;</span>
+                <h2>进入房间</h2>
+                
+                <form id="checkInForm" >
+                    <label for="identity">选择身份:</label>
+                    <select id="identity1" name="identity1">
+                        <option value="air_service">空调管理员</option>
+                        <option value="front_service">前台服务</option>
+                    </select>
+                    <br>
+                    <label for="username">用户名:</label>
+                    <input type="text" id="username1" name="username1" required>
+                    <br>
+                    <label for="password">密码:</label>
+                    <input type="password" id="password1" name="password1" required>
+                    <br>
+                    <button type="submit" onclick="login()">登录</button>
+                </form>
+            </div>
+          </div>
+
+
     </div>
-    <div class="container">
+
+    <div class="banner">
+
+
+        <div class="welcome">
+            <h1>波普特酒店后台管理系统</h1>   
+        </div>
+    </div>
+
+
+
+
+    <script src="script_ad.js"></script>
+
+    
+    <!-- <div class="container">
         <ul class="room-list">
             <li class="room-item">
                 <div class="room-info">
@@ -108,9 +131,9 @@
                 </div>
             </li>
 
-            <!-- 在此添加更多房间信息 -->
+      
 
         </ul>
-    </div>
+    </div> -->
 </body>
 </html>

@@ -20,17 +20,17 @@
             </ul>
         </nav>
 
-        <div class="language">
+        <!-- <div class="language">
             <select>
                 <option value="en">English</option>
                 <option value="zh">中文</option>
             </select>
-        </div>
+        </div> -->
 
         <div class="user-options">
             <a href="#" onclick="showEnterRoomForm()">进入房间</a> | 
             <a href="#" onclick="showRegisterForm()">办理入住</a> | 
-            <a target="_blank" href="D:\workspace\web\Administrator.html">后台</a>
+            <a target="_blank" href="D:\workspace\web\Administrator.html">后台</a></div>
             
 
         <div id="registerForm" class="modal">
@@ -70,7 +70,7 @@
                 
                 <form id="checkInForm" >
                     <label for="roomNumber">选择房间:</label>
-                    <select id="roomNumber" name="roomNumber">
+                    <select id="roomNumber1" name="roomNumber1">
                       <option value="101">101</option>
                       <option value="102">102</option>
                       <option value="103">103</option>
@@ -78,10 +78,10 @@
                     </select>
                     <br>
                     <label for="username">用户名:</label>
-                    <input type="text" id="username" name="username" required>
+                    <input type="text" id="username1" name="username1" required>
                     <br>
                     <label for="password">密码:</label>
-                    <input type="password" id="password" name="password" required>
+                    <input type="password" id="password1" name="password1" required>
                     <br>
                     <button type="submit" onclick="enterRoom()">进入房间</button>
                 </form>

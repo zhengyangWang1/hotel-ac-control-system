@@ -22,8 +22,10 @@ def login_room(request):
         password = request.POST.get('password')
         try:
             user = models.User.objects.get(room_id=room_id, user_id=user_id, password=password)
+            context = {'room_id': room_id, 'cost': 0}
             # 如果用户名和密码匹配，登录成功，返回包含JavaScript的页面
-            return render(request, 'success_login.html')
+            return render(request, 'tem_c2.html', context)
+
         except models.User.DoesNotExist:
             # 如果用户不存在或密码不匹配，返回登录页面或其他提示页面
             return render(request, 'login.html')

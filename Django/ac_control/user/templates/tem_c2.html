@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
-
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <title>空调控制系统</title>
-    <link rel="stylesheet" type="text/css" href="../../../../hotel-ac-control-system-web/css/styles_tc.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'styles_tc.css' %}">
     <style>
         body {
-            background-image: url('../../../../hotel-ac-control-system-web/tem_c.jpg'); /* 图像文件的路径 */
+            background-image: url('{% static 'tem_c.jpg' %}'); /* 图像文件的路径 */
             background-size: cover; /* 自动缩放以适应屏幕 */
             background-repeat: no-repeat; /* 不重复图像 */
             background-attachment: fixed; /* 固定背景图像 */

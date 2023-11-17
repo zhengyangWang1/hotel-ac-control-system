@@ -88,7 +88,7 @@ select {
 
 
 .header{
-    background-color:#333;
+    background-color:#2d2e30;
 
 }
 .container{
@@ -117,9 +117,12 @@ select {
     line-height: 60px;
 }
 .header  a{
-    color:#b0b0b0;
+    color:#fff;
     line-height:60px;
     display:inline-block;
     font-size:16px;
     margin-right: 5px;
 }
+.header a:hover {
+    text-decoration: underline;
+  }

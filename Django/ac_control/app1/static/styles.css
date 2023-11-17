@@ -1,0 +1,197 @@
+body {
+    background-color: #f5f5f5; /* 浅灰色背景 */
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+
+header {
+    background-color: #003366; /* 深蓝色背景 */
+    /* background-color:linear-gradient(to right, #0074D9, #003366); */
+    color: #fff; /* 白色文字 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+.logo{
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+}
+
+nav ul li {
+    margin-right: 20px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #fff; /* 白色链接文字 */
+}
+
+.language select {
+    height:
+    background-color: transparent;
+    border: none;
+    color: #fff; /* 白色文字 */
+}
+
+.user-options a {
+    text-decoration: none;
+    color: #fff; /* 白色链接文字 */
+}
+
+.banner {
+    position: relative;
+}
+
+.banner img {
+    width: 100%;
+    height: 200%;
+    opacity: 0.95;
+}
+
+.welcome {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff; /* 白色文字 */
+    font-family:"Times New Roman"
+}
+
+.welcome h1 {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+.welcome p {
+    font-size: 30px;
+    margin-bottom: 20px;
+    
+}
+
+
+.submit_button {
+    background-color: #cc3333; 
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 10px;
+    border-radius: 5px;
+}
+
+
+
+.select {
+    background-color: #c3c5f0;
+    color: #171313;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+  }
+
+ 
+.ac-status {
+    margin-top: 20px;
+}
+
+.ac-status button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+.modal {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+  }
+  
+  .modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  .user-options a {
+    text-decoration: none;
+    color: #fff;
+    padding: 10px 20px;
+  }
+  
+  .user-options a:hover {
+    text-decoration: underline;
+  }
+  
+  .modal-content h2 {
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    color: #333;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1em;
+    color: #333;
+  }
+  
+  input[type="text"],
+  input[type="password"],
+  select,
+  button {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+  }
+  
+  button {
+    background-color: #003366;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 1em;
+  }
+  
+  button:hover {
+    background-color: #003366;
+  }
+  

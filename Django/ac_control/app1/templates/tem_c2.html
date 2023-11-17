@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>空调控制系统</title>
+    <link rel="stylesheet" type="text/css" href="../../../../hotel-ac-control-system-web/css/styles_tc.css">
+    <style>
+        body {
+            background-image: url('../../../../hotel-ac-control-system-web/tem_c.jpg'); /* 图像文件的路径 */
+            background-size: cover; /* 自动缩放以适应屏幕 */
+            background-repeat: no-repeat; /* 不重复图像 */
+            background-attachment: fixed; /* 固定背景图像 */
+            background-position: center center; /* 图像在容器中水平和垂直居中 */
+            font-family: Arial, sans-serif; /* 指定字体 */
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="control-panel">
+        <h1>空调控制系统</h1>
+
+        <div class="room-number">
+            <h2>房间号</h2>
+            <h2 id="displayRoomNumber"></h2>
+            <!-- <h2>XXX</h2> -->
+        </div>
+
+        <div class="ac-status">
+            <h2>空调状态</h2>
+            <button id="ac-toggle" onclick="toggleAC()">开启</button>
+            <p id="ac-status-text">空调已关闭</p>
+        </div>
+
+        <div class="control-container">
+            <div class="temperature-control">
+                <h2>温度</h2>
+                <div class="temperature-display">
+                    <span id="temperature">22°C</span>
+                </div>
+                <input type="range" id="temperature-slider" min="16" max="30" value="22" step="1">
+            </div>
+
+            <div class="fan-speed-control">
+                <h2>风度</h2>
+                <div class="fan-speed-display">
+                    <span id="fan-speed">中风</span>
+                </div>
+                <input type="range" id="fan-speed-slider" min="1" max="3" value="2" step="1">
+            </div>
+
+            <div class="mode-control">
+                <h2>模式</h2>
+                <select id="mode-selector">
+                    <option value="cool">制冷</option>
+                    <option value="heat">制热</option>
+                    <option value="fan">送风</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="status-container">
+            <div class="status">
+                <h2>耗电量</h2>
+                <span id="power-consumption">0.75 kWh</span>
+            </div>
+
+            <div class="status">
+                <h2>费用</h2>
+                <span id="cost">$0.15</span>
+            </div>
+
+        </div>
+
+        <div>
+            <input type="submit" value="退房">
+        </div>
+    </div>
+
+
+    <script>
+        // 获取温度控制滑块元素
+        var temperatureSlider = document.getElementById("temperature-slider");
+        var temperatureValue = document.getElementById("temperature");
+    
+        // 获取风度控制滑块元素
+        var fanSpeedSlider = document.getElementById("fan-speed-slider");
+        var fanSpeedValue = document.getElementById("fan-speed");
+    
+        // 获取空调模式选择器元素
+        var modeSelector = document.getElementById("mode-selector");
+    
+        // 获取耗电量和费用元素
+        var powerConsumptionValue = document.getElementById("power-consumption");
+        var costValue = document.getElementById("cost");
+    
+        // 添加事件监听器来响应滑块和选择器的变化
+        temperatureSlider.addEventListener("input", function() {
+            temperatureValue.innerText = temperatureSlider.value + "°C";
+            // 更新耗电量和费用
+            updatePowerConsumptionAndCost();
+        });
+    
+        fanSpeedSlider.addEventListener("input", function() {
+            var fanSpeed = fanSpeedSlider.value;
+            if (fanSpeed === "1") {
+                fanSpeedValue.innerText = "低风";
+            } else if (fanSpeed === "2") {
+                fanSpeedValue.innerText = "中风";
+            } else if (fanSpeed === "3") {
+                fanSpeedValue.innerText = "高风";
+            }
+            // 更新耗电量和费用
+            updatePowerConsumptionAndCost();
+        });
+    
+        modeSelector.addEventListener("change", function() {
+            // 更新耗电量和费用
+            updatePowerConsumptionAndCost();
+        });
+    
+        // 更新耗电量和费用
+        function updatePowerConsumptionAndCost() {
+            var temperature = parseInt(temperatureSlider.value);
+            var fanSpeed = parseInt(fanSpeedSlider.value);
+            var mode = modeSelector.value;
+    
+            // 假设简单的计算模型
+            var powerConsumption = (temperature - 20) * 0.05 * fanSpeed;
+            var cost = powerConsumption * 0.2; // 假设每度电费用为0.2元
+    
+            powerConsumptionValue.innerText = powerConsumption.toFixed(2) + " kWh";
+            costValue.innerText = "$" + cost.toFixed(2);
+        }
+    
+        // 初始化
+        updatePowerConsumptionAndCost();
+
+        var acToggleBtn = document.getElementById("ac-toggle");
+        var acStatusText = document.getElementById("ac-status-text");
+        var isACOn = false;
+
+        function toggleAC() {
+            isACOn = !isACOn;
+            if (isACOn) {
+                acToggleBtn.textContent = "关闭";
+                acStatusText.textContent = "空调已开启";
+            } else {
+                acToggleBtn.textContent = "开启";
+                acStatusText.textContent = "空调已关闭";
+            }
+        }
+       
+        // 当页面加载时执行此函数
+        document.addEventListener('DOMContentLoaded', function() {
+        // 从localStorage获取房间号
+        var roomNumber = localStorage.getItem('chosenRoomNumber');
+
+        // 如果存在房间号，则更新页面上的内容
+        if (roomNumber) {
+            document.querySelector('.room-number h2').textContent = roomNumber;
+        } else {
+            document.querySelector('.room-number h2').textContent = '未选择';
+        }
+        });
+
+    </script>
+    
+</body>
+</html>

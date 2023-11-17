@@ -21,17 +21,16 @@ Including another URLconf
 #     path("admin/", admin.site.urls),
 # ]
 
-from django.urls import path
+from django.urls import path, include
 # from django.conf.urls import url 这段代码已经过时，上面的re_path取代了之前版本的url
-from app1 import views  # from app1 import是从Django/HelloWorld往下找
+from user import views as user_views  # from user import是从Django/HelloWorld往下找
+from manager import views as manager_views
 
-# from ..app1 import是从当前文件位置
+# from ..user import是从当前文件位置
 
 urlpatterns = [
-    path('', views.login, name='login'),  # 将根路径映射到登录页面
-    path('login/', views.login),
-    path('register/', views.register, name='register'),
-    path('login_room/', views.login_room, name='login_room'),
+
+    path('', include("user.urls")),
+    path('manager/', include("manager.urls")),
 
 ]
-

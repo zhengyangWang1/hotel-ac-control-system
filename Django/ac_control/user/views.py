@@ -22,7 +22,7 @@ def login_room(request):
         password = request.POST.get('password')
         try:
             user = models.User.objects.get(room_id=room_id, user_id=user_id, password=password)
-            context = {'room_id': room_id, 'cost': 0}
+            context = {'room_id': room_id,'user_id':user_id,'cost': 0,'sum_cost': 0,'cur_tem':"not set",'cur_wind':"not set"}
             # 如果用户名和密码匹配，登录成功，返回包含JavaScript的页面
             return render(request, 'tem_c2.html', context)
 
@@ -82,3 +82,6 @@ def change_temp_wind(request):
     models.Room.objects.create(room_id=room_id, user_id=user_id, temp=temp, wind_speed=wind_speed,
                                change_time=datetime.datetime.now())
     return render(request, '显示更改成功')
+
+
+   

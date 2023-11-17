@@ -87,7 +87,10 @@ DATABASES = {
         "NAME": "hotel",  # 数据库名字
         "USER": 'root',  # 用户名
         'PASSWORD': '123456',
+
+
         'HOST': '10.29.0.110',  # 主机
+
         'PORT': '3306',
     }
 }

@@ -1,5 +1,5 @@
 """
-URL configuration for HelloWorld project.
+URL configuration for ac_control project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -30,8 +30,8 @@ from app1 import views  # from app1 import是从Django/HelloWorld往下找
 urlpatterns = [
     path('', views.login, name='login'),  # 将根路径映射到登录页面
     path('login/', views.login),
-    path('register/', views.register, name='register')
-
+    path('register/', views.register, name='register'),
+    path('login_room/', views.login_room, name='login_room'),
 
 ]
 

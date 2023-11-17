@@ -69,7 +69,8 @@
                 <span class="close" onclick="closeEnterRoomForm()">&times;</span>
                 <h2>进入房间</h2>
                 
-                <form id="checkInForm" >
+                <form id="checkInForm" action="{% url 'login_room' %}" method="post" >
+                    {% csrf_token %}
                     <label for="roomNumber">选择房间:</label>
                     <select id="roomNumber" name="roomNumber">
                       <option value="101">101</option>
@@ -84,7 +85,7 @@
                     <label for="password">密码:</label>
                     <input type="password" id="password" name="password" required>
                     <br>
-                    <button type="submit" onclick="enterRoom()">进入房间</button>
+                    <button type="submit" onclick="return enterRoom()">进入房间</button>
                 </form>
             </div>
           </div>

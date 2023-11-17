@@ -3,9 +3,9 @@
   <component name="FacetManager">
     <facet type="django" name="Django">
       <configuration>
-        <option name="rootFolder" value="$MODULE_DIR$/Django/HelloWorld" />
-        <option name="settingsModule" value="HelloWorld/settings.py" />
-        <option name="manageScript" value="manage.py" />
+        <option name="rootFolder" value="$MODULE_DIR$/Django" />
+        <option name="settingsModule" value="ac_control/ac_control/settings.py" />
+        <option name="manageScript" value="ac_control/manage.py" />
         <option name="environment" value="&lt;map/&gt;" />
         <option name="doNotUseTestRunner" value="false" />
         <option name="trackFilePattern" value="" />

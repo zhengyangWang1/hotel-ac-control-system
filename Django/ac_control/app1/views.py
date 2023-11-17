@@ -15,6 +15,21 @@ def register(request):
         return render(request, 'login.html')
 
 
+def login_room(request):
+    if request.method == 'POST':
+        room_id = request.POST.get('roomNumber')
+        user_id = request.POST.get('username')
+        password = request.POST.get('password')
+        try:
+            user = models.User.objects.get(room_id=room_id, user_id=user_id, password=password)
+            # 如果用户名和密码匹配，登录成功，返回包含JavaScript的页面
+            return render(request, 'success_login.html')
+        except models.User.DoesNotExist:
+            # 如果用户不存在或密码不匹配，返回登录页面或其他提示页面
+            return render(request, 'login.html')
+
+    return render(request, 'login.html')
+
 
 def login(request):
     return render(request, 'login.html')

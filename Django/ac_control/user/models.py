@@ -1,31 +1,10 @@
 from django.db import models
 
+from threading import Timer
+import time
+
 
 # Create your models here.
-class SevringQueue(models.Model):
-    room_list = []
-
-    def Insert(self, room):
-        room.state = 1
-        room.scheduling_num += 1
-        self.room_list.append(room)
-        self.room_list.sort(key=lambda x:(x.fan_speed))    # 按照风速排列
-        return True
-
-
-    def delete(self):
-        1
-
-    def update_severing_time(self):
-        1
-
-
-
-
-
-
-
-
 
 # 用户类
 class User(models.Model):

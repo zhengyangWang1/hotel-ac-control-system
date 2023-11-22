@@ -1,5 +1,8 @@
 from django.db import models
 
+from threading import Timer
+import time
+
 
 # Create your models here.
 
@@ -23,50 +26,70 @@ class User(models.Model):
     room_id = models.CharField('room_id', max_length=10)
     # 密码
     password = models.CharField('password', max_length=30)
+    # 入住日期
+    begin_date = models.DateField('begin_data', max_length=30, auto_now=True)
+    # 退房日期
+    out_date = models.DateTimeField('out_data', max_length=30, auto_now=True)
 
     # 指定表名
     class Meta:
         db_table = 'User'
 
-
 # 储存所有房间的每个请求  详单表
 class Room(models.Model):
+    # 风速范围
+    FAN_SPEED = [
+        (3, "HIGH"),
+        (2, "MIDDLE"),
+        (1, "LOW"),
+    ]
+    # 房间状态
+    ROOM_STATE = [
+        (1, "SERVING"),
+        (2, "WAITING"),
+        (3, "SHUTDOWN"),
+        (4, "BACKING")  # 休眠
+    ]
+    # 新的详单记录产生条件
+    OPERATION_CHOICE = [
+        (1, '调温'),
+        (2, '调风'),
+        (3, '开机'),
+        (4, '关机')
+    ]
+
     # 请求号 主键 默认自增
     request_id = models.AutoField('operation_id', primary_key=True)
     # 房间号
     room_id = models.CharField('room_id', max_length=10)
     # 目前的用户
     user_id = models.CharField('user_id', max_length=30)
-    # 房间空调的温度
-    temp = models.IntegerField('温度', null=False)
+    # 初始温度
+    init_temp = models.IntegerField('初始温度', null=False, default=0.0)
+    # 当前温度
+    current_temp = models.IntegerField('当前温度', null=False, default=25.0)
+    # 目标温度
+    target_temp = models.IntegerField('目标温度', null=False, default=0.0)
     # 房间空调的风速
-    wind_speed = models.IntegerField('wind_speed', null=False)  # 1-10代表风速
-    # 开启时间
-    open_time = models.DateTimeField(null=True, blank=True)  # 可以为null
-    # 关闭时间
-    close_time = models.DateTimeField(null=True, blank=True)  # 可以为null
-    # 调整参数
-    change_time = models.DateTimeField(null=True, blank=True)  # 可以为null
+    fan_speed = models.IntegerField(verbose_name='风速', choices=FAN_SPEED, default=2)
+    # 房间状态
+    state = models.IntegerField(verbose_name='服务状态', choices=ROOM_STATE, default=3)
+    # 当前服务时长
+    serve_time = models.IntegerField(verbose_name='当前服务时长', default=0)
+    # 当前等待时长
+    wait_time = models.IntegerField(verbose_name='当前等待时长', default=0)
+    # 操作类型
+    operation = models.IntegerField(verbose_name='操作类型', choices=OPERATION_CHOICE, default=0)
+    # 调度次数
+    scheduling_num = models.IntegerField(verbose_name='调度次数', default=0)
+    # 费用
+    fee = models.FloatField(verbose_name='费用', default=0.0)
 
     # 指定表名
     class Meta:
         db_table = 'Room'
 
 
-# 储存每个房间的空调状态  房间表
-class AirCondition(models.Model):
-    # 房间号 主键
-    room_id = models.CharField('room_id', max_length=10, primary_key=True)
-    # 用户id
-    user_id = models.CharField('user_id', max_length=20, null=False)
-    # 房间空调的温度
-    temp = models.IntegerField('温度', null=False)
-    # 房间空调的风速
-    wind_speed = models.IntegerField('wind_speed', null=False)  # 1-10代表风速
 
-    class Meta:
-        db_table = 'AirCondition'
-
-# 账单表
-
-
+# python manage.py makemigrations
+# python manage.py migrate

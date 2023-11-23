@@ -1,0 +1,142 @@
+.blurred-background {
+    position: fixed; /* 固定位置 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('ad.jpg'); /* 替换为你的图片路径 */
+    background-repeat: no-repeat;
+    background-size: cover;
+    filter: blur(16px); /* 模糊效果，数值可调整 */
+    z-index: -1; /* 确保背景在其他内容之后 */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+    /* background-image: url('ad.jpg'); 
+    background-repeat: no-repeat;
+    background-size: cover; */
+
+}
+
+
+body {
+    /* 其他样式保持不变 */
+    position: relative; /* 确保 body 相对定位 */
+    background: none; /* 移除原有背景图 */
+}
+
+
+.header {
+    background-color: #2d2e30;
+    color: #fff; /* 白色文字 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+.logo{
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+}
+nav ul {
+    list-style: none;
+    display: flex;
+}
+
+nav ul li {
+    margin-right: 20px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #fff; /* 白色链接文字 */
+}
+
+* {box-sizing: border-box}
+
+/* 为选项卡设置样式 */
+.tab {
+  float: left;
+  border: 1px solid #ccc;
+  background-color: #bebdb43c;
+  width: 10%;
+  height: 900px;
+}
+
+/* 为用于打开选项卡内容的按钮设置样式 */
+.tab button {
+  display: block;
+  background-color: inherit;
+  color: black;
+  padding: 22px 16px;
+  width: 100%;
+  border: none;
+  outline: none;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* 更改悬停按钮的背景颜色 */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* 创建一个 active/current 的 "tab button" 类 */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* 设置选项卡内容的样式 */
+.tabcontent {
+  background-color: #cccccc00;
+  float: left;
+  padding: 0px 12px;
+  border: 1px solid #ccc;
+  width: 90%;
+  border-left: none;
+  height: 900px;
+}
+
+.details {
+    background-color: #f7f7f7; /* 浅灰色背景 */
+}
+
+button {
+    /* background-color: #4CAF50; 绿色背景 */
+    color: white; /* 白色文字 */
+    padding: 5px 20px; /* 内边距 */
+    border: none; /* 无边框 */
+    border-radius: 5px; /* 圆角边框 */
+    cursor: pointer; /* 鼠标悬停时的指针样式 */
+    transition: all 0.3s; /* 过渡效果 */
+    margin-right: 5px; /* 右边距 */
+}
+
+button:hover {
+    background-color: #93a094; /* 悬停时更深的绿色 */
+}
+
+table {
+    width: 100%; /* 可选，根据需要设置表格宽度 */
+    border-collapse: collapse; /* 使边框合并为单一的边框 */
+}
+
+table th, table td {
+    text-align: center; /* 水平居中 */
+    vertical-align: middle; /* 垂直居中 */
+   
+}
+
+/* 可以添加更多样式来美化表格，如边框、背景色等 */
+table thead {
+    font-size: 18px; /* 表头字体大小 */
+}
+
+table tbody {
+    font-size: 18px; /* 表体字体大小 */
+}

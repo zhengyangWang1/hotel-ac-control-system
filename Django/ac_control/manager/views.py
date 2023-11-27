@@ -51,7 +51,7 @@ class Queue(View):
 
 class ServingQueue(Queue):
     serving_num = 0
-
+    queue_type = 1  # 1为服务状态
     def insert(self, room, queue_type):
         super().insert(room, queue_type=queue_type)
         self.serving_num += 1
@@ -67,6 +67,7 @@ class ServingQueue(Queue):
 
 class WaitingQueue(Queue):
     waiting_num = 0
+    queue_type = 2  # 2为等待状态
 
     def insert(self, room, queue_type):
         super().insert(room, queue_type=queue_type)
@@ -159,7 +160,7 @@ class WaitingQueue(Queue):
 #         timer = Timer(60, self.update_waiting_time)  # 每1min执行一次函数
 #         timer.start()
 
-class Scheduler(View):
+class Scheduler(View):  # 在views里直接创建
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # 在这里进行初始化操作
@@ -191,7 +192,7 @@ class Scheduler(View):
         return True
 
     # 用户申请资源
-    def request_on(self, room_id, current_temp):
+    def request_on(self, room_id, current_temp):  # 用户开机时调用
         '''
         一个请求到来，第一次开机分配房间对象然后处理，否则直接处理
         调用调度算法
@@ -201,11 +202,11 @@ class Scheduler(View):
         return_room = self.get_or_create_room(room_id, current_temp)
 
         if self.SQ.serving_num < 3:
-            self.SQ.insert(return_room)
+            self.SQ.insert(return_room)  # 进入服务队列 state = 1
         else:
-            self.WQ.insert(return_room)
+            self.WQ.insert(return_room)  # 进入等待队列 state = 2
 
-        return_room.request_time = timezone.now()
+        return_room.request_time = timezone.now()  # 数据库room表没有request_time项
         return_room.request_id = self.request_id
         self.request_id += 1
         return_room.operation = 3

@@ -30,6 +30,13 @@ change_temp_wind函数：用户更改风速和温度后点击确定，发送post
 
 close_ac函数：用户点击关机后执行，将空调从调度队列移除
 
+request_on函数：用户请求房间资源，判断房间是否已存在，分配资源
+
+request_off函数：用户关机，设置房间状态为shutdown，从队列中清除
+
+change_target_temp函数：用户设置房间的目标温度，更新出一条新的请求（数据库）
+
+change_fan_speed函数：用户调整房间风速，更新出一条新的请求（数据库）
 
 #### 服务端
 

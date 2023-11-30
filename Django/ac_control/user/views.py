@@ -73,7 +73,7 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
 def change_ac_state(request):
     room_id = request.POST.get('room_id')
     room = scheduler.rooms
-    room = models.Room.objects.get(room_id=room_id)
+    room = Room.objects.get(room_id=room_id)
     new_state = room.state  # 获取当前房间状态
     return JsonResponse({'room_id': room_id, 'new_state': new_state})
 
@@ -93,8 +93,11 @@ def change_temp_wind(request):
     room_id = request.POST.get('room_id')
     temp = request.POST.get('temp')
     wind_speed = request.POST.get('wind_speed')
-    # 更改AirCondition中空调的参数
-    ac = models.AirCondition.objects.get(room_id=room_id)
+    # 更新参数
+    room = Room.objects.get(room_id=room_id)
+    room.target_temp = temp
+    room.fan_speed = wind_speed
+
     ac.temp = temp
     ac.wind_speed = wind_speed
     ac.save()  # 更新room表中的信息

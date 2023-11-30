@@ -22,7 +22,7 @@ function enableControls() {
 }
 
 // 初始化禁用控件
-disableControls();
+// disableControls();
 
 temperatureSlider.addEventListener("input", function() {
     if (isACOn) {
@@ -70,7 +70,7 @@ function toggleAC() {
             isACOn = newState === 'on';
             acToggleBtn.textContent = isACOn ? "关闭" : "开启";
             acStatusText.textContent = isACOn ? "空调已开启" : "空调已关闭";
-            
+
             // 根据空调状态启用或禁用控件
             if (isACOn) {
                 enableControls();

@@ -67,25 +67,49 @@
 
             <!-- <div class="ac-status">
                 <h2>空调状态</h2>
-
                 <p id="ac-status-text">空调已关闭</p>
                 <button type="button" id="ac-toggle" onclick="toggleAC()">开启</button>  
             
                 <input type="hidden" id="ac-state" name="ac_state" value="off">
             </div> -->
 
-            <form id="ac_control_panel" action="" method="post">
-                <input type="hidden" name="room_id" value="{{ room_id }}">
-                <input type="hidden" id="ac-state" name="ac_state" value="off">
+{#            <form id="ac_control_panel" action="" method="post">#}
+{#                <input type="hidden" name="room_id" value="{{ room_id }}">#}
+{#                <input type="hidden" id="ac-state" name="ac_state" value="off">#}
+{#            #}
+{#                <div class="ac-status">#}
+{#                    <h2>空调状态</h2>#}
+{#                    <p id="ac-status-text">空调已关闭</p>#}
+{#                    <button type="button" id="ac-toggle" onclick="toggleAC()">开启空调</button>#}
+{#                </div>#}
+{#            </form>#}
             
+            <!-- 开启空调的表单 -->
+            <div>
+            <form id="ac_open_panel" action="{% url 'open_ac' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="room_id" value="{{ room_id }}">
+
                 <div class="ac-status">
                     <h2>空调状态</h2>
-                    <p id="ac-status-text">空调已关闭</p>
-                    <button type="button" id="ac-toggle" onclick="toggleAC()">开启空调</button>
+                    <p id="ac-status-text">空调已关闭</p >
+                    <button type="submit">开启空调</button>
                 </div>
             </form>
-            
-            
+            </div>
+
+
+            <!-- 关闭空调的表单 -->
+            <div>
+            <form id="ac_close_panel" action="{% url 'close_ac' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="room_id" value="{{ room_id }}">
+
+                <div class="ac-status">
+                    <button type="submit">关闭空调</button>
+                </div>
+            </form>
+            </div>
             <!-- <div class="control-container">
                 <div class="temperature-control">
                     <h2>温度</h2>

@@ -32,5 +32,10 @@ urlpatterns = [
 
     path('', include("user.urls")),
     path('manager/', include("manager.urls")),
+    path('', user_views.login, name='login'),  # 将根路径映射到登录页面
+
+    path('open_ac/', user_views.open_ac, name='open_ac'),
+
+    path('close_ac/', user_views.close_ac, name='close_ac'),
 
 ]

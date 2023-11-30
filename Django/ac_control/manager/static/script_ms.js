@@ -73,3 +73,27 @@ function openCity(evt, cityName) {
         button.parentNode.parentNode.parentNode.insertBefore(newDetailsRow, button.parentNode.parentNode.nextSibling);
     }
 }
+
+
+function filterTable() {
+    var roomNumberInput = document.getElementById('roomNumberSearch').value;
+    var checkInDateInput = document.getElementById('checkInDateSearch').value;
+    var table = document.querySelector('.table-hover tbody');
+    var tr = table.getElementsByTagName('tr');
+
+    for (var i = 0; i < tr.length; i++) {
+        var tdRoomNumber = tr[i].getElementsByTagName('td')[0];
+        var tdCheckInDate = tr[i].getElementsByTagName('td')[2];
+
+        if (tdRoomNumber && tdCheckInDate) {
+            var roomNumberText = tdRoomNumber.textContent || tdRoomNumber.innerText;
+            var checkInDateText = tdCheckInDate.textContent || tdCheckInDate.innerText;
+
+            if (roomNumberText.indexOf(roomNumberInput) > -1 && checkInDateText.indexOf(checkInDateInput) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }       
+    }
+}

@@ -140,3 +140,34 @@ table thead {
 table tbody {
     font-size: 18px; /* 表体字体大小 */
 }
+
+
+.search-bar {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.search-bar input[type="text"],
+.search-bar input[type="date"] {
+    padding: 8px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    background-color:  #a6a5a5;
+    color: white;
+    cursor: pointer;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar button:hover {
+    background-color: #93a094;
+}

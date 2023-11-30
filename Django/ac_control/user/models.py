@@ -1,8 +1,9 @@
 from django.db import models
+from django.utils import timezone
 
 from threading import Timer
 import time
-
+import django
 
 # Create your models here.
 
@@ -60,6 +61,8 @@ class Room(models.Model):
 
     # 请求号 主键 默认自增
     request_id = models.AutoField('operation_id', primary_key=True)
+    # 请求时间
+    request_time = models.DateTimeField(verbose_name="请求发出时间", default=django.utils.timezone.now)
     # 房间号
     room_id = models.CharField('room_id', max_length=10)
     # 目前的用户
@@ -88,6 +91,9 @@ class Room(models.Model):
     # 指定表名
     class Meta:
         db_table = 'Room'
+
+
+
 
 
 

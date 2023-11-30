@@ -28,9 +28,9 @@ class User(models.Model):
     # 密码
     password = models.CharField('password', max_length=30)
     # 入住日期
-    begin_date = models.DateField('begin_data', max_length=30, auto_now=True)
+    begin_date = models.DateField('begin_date', max_length=30, auto_now=True)  # 在用户入住时修改 是否需要时间
     # 退房日期
-    out_date = models.DateTimeField('out_data', max_length=30, auto_now=True)
+    out_date = models.DateTimeField('out_date', max_length=30, auto_now=True)  # 在用户退房时修改
 
     # 指定表名
     class Meta:

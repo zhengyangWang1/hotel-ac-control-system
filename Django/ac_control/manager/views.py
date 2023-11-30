@@ -53,7 +53,7 @@ class Queue(View):
 
 class ServingQueue(Queue):
     serving_num = 0
-
+    queue_type = 1  # 1为服务状态
     def insert(self, room, queue_type):
         super().insert(room, queue_type=queue_type)
         self.serving_num += 1
@@ -69,6 +69,7 @@ class ServingQueue(Queue):
 
 class WaitingQueue(Queue):
     waiting_num = 0
+    queue_type = 2  # 2为等待状态
 
     def insert(self, room, queue_type):
         super().insert(room, queue_type=queue_type)
@@ -84,7 +85,7 @@ class WaitingQueue(Queue):
         super().update_time(queue_type=2)
 
 
-class Scheduler(View):
+class Scheduler(View):  # 在views里直接创建
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # 在这里进行初始化操作
@@ -116,7 +117,7 @@ class Scheduler(View):
         return True
 
     # 用户申请资源
-    def request_on(self, room_id, current_temp):
+    def request_on(self, room_id, current_temp):  # 用户开机时调用
         '''
         一个请求到来，第一次开机分配房间对象然后处理，否则直接处理
         调用调度算法
@@ -126,16 +127,15 @@ class Scheduler(View):
         return_room = self.get_or_create_room(room_id, current_temp)
 
         if self.SQ.serving_num < 3:
-            self.SQ.insert(return_room)
+            self.SQ.insert(return_room)  # 进入服务队列 state = 1
         else:
-            self.WQ.insert(return_room)
+            self.WQ.insert(return_room)  # 进入等待队列 state = 2
 
-        # 写入数据库
-        return_room.request_time = timezone.now()
+
         return_room.request_id = self.request_id
         self.request_id += 1
         return_room.operation = 3
-        return_room.save(force_insert=True)
+        return_room.save(force_insert=True)  # 存入数据库
 
         return return_room
 
@@ -157,11 +157,11 @@ class Scheduler(View):
         return None
 
     # 用户关机
-    def request_off(self, room_id):
+    def request_off(self, room_id):  # 将指定房间状态设为3：关闭
         for room in self.SQ.room_list:
             if room.room_id == room_id:
                 # 房间回到初始温度
-                room.current_temp = room.init_temp
+                room.current_temp = room.init_temp  # 为什么房间直接回到初始温度？
                 # 修改房间状态
                 if room.state == 1:  # 服务队列中
                     room.state = 3
@@ -257,7 +257,7 @@ class Scheduler(View):
         if len(self.WQ.room_list) != 0 and len(self.SQ.room_list) < 3:
             severing_num = len(self.SQ.room_list)
             i = 1
-            for room in self.WQ.room_list:
+            for room in self.WQ.room_list:  # 遍历等待队列，将等待中的房间插入服务队列
                 if i <= 3 - severing_num:
                     self.WQ.delete(room)
                     self.SQ.insert(room)

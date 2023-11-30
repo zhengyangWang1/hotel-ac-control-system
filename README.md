@@ -1,22 +1,41 @@
 # hotel-ac-control-system 酒店空调管理系统
 ### SE小组作业
 
-#### TODO
-- [ ] 学习Django中 课程： https://www.bilibili.com/video/BV1rT4y1v7uQ?p=42&spm_id_from=pageDriver&vd_source=7d4ddbfe6a66f2fbe94075935b693c57
-- [ ] 学习用Git上传代码 可视化Git学习网站：https://learngitbranching.js.org/?locale=zh_CN
-- [x] 使用Git创建各自的branch，建立远程仓库与本地的连接
+### 前端
+#### 用户端
 
-#### 工程架构
-前端：Vue  @er wang
 
-后端：Django  @muuuu111 @Yang
+- [ ] 从后端用{{ }}接收空调的状态
+- [ ] 用户更改温度和风速，提交form表单，包括(room_id, temp, wind_speed)
+- [ ] 开关空调的按钮，点击后执行对应函数，修改toggleAC()来实现，需要把room_id传给后端
 
-数据库：MySQL  @gaovva
+#### 服务端
 
-传输协议：HTTP（暂定）
+### views
+#### 用户端
 
-![image](https://github.com/zhengyangWang1/hotel-ac-control-system/assets/94629354/3737dfd6-842d-4a70-b48e-4a792a469add)
+等待和服务队列中的room对象都是数据库中的数据，可以在views中查询更改
 
-![](https://cdn.jsdelivr.net/gh/zhengyangWang1/image@main/img/20231010102445.png)
+register函数：在用户点击办理入住时执行，将用户添加到数据库中的user表
 
-gaovva
+login函数：返回login页面，在程序运行后立即执行
+
+login_room函数：在用户点击进入房间，输入正确的id和密码时执行，转至tem_c2页面
+
+open_ac函数：用户点击开机后执行，创建room对象，将空调加入调度队列，给前端返回空调状态
+
+change_ac_state函数：空调有四个状态（1：服务，2：等待，3：关机，4：休眠），前端用js函数每秒轮询空调状态时执行该函数，函数把空调状态反馈给前端
+
+change_temp_wind函数：用户更改风速和温度后点击确定，发送post请求到后端，执行该函数，更改Room表中的数据
+
+close_ac函数：用户点击关机后执行，将空调从调度队列移除
+
+
+#### 服务端
+
+
+### 调度系统
+
+- [ ] 搞清楚调度队列中的对象是不是数据库中的表，是不是一条数据代表一个房间（在实现时发现一条数据一个房间是很有必要的）
+
+### 打印账单和详单

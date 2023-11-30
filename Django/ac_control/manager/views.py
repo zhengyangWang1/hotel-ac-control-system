@@ -52,7 +52,7 @@ class Queue(View):
 class ServingQueue(Queue):
     serving_num = 0
     queue_type = 1  # 1为服务状态
-    def insert(self, room, queue_type):
+    def insert(self, room, queue_type=1):
         super().insert(room, queue_type=queue_type)
         self.serving_num += 1
         return True
@@ -69,7 +69,7 @@ class WaitingQueue(Queue):
     waiting_num = 0
     queue_type = 2  # 2为等待状态
 
-    def insert(self, room, queue_type):
+    def insert(self, room, queue_type=2):
         super().insert(room, queue_type=queue_type)
         self.waiting_num += 1
         return True
@@ -169,7 +169,7 @@ class Scheduler(View):  # 在views里直接创建
         self.h_rate_fee = None
         self.m_rate_fee = None
         self.l_rate_fee = None
-        self.request_id = 0
+        self.request_id = 1
         self.request_num = 0
         self.rooms = []  # 储存房间队列，最多有5个房间
 

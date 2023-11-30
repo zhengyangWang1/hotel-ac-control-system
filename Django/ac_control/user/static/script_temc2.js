@@ -8,7 +8,7 @@
 
 //  // 获取空调模式选择器元素
 //  var modeSelector = document.getElementById("mode-selector");
- 
+
 
 //  // 获取耗电量和费用元素
 //  var powerConsumptionValue = document.getElementById("power-consumption");
@@ -36,11 +36,10 @@
 //          // 记录当前选择的模式
 //         this.setAttribute('data-prev', this.value);
 //     } else {
-       
+
 //         alert('空调未开启！');
 //     }
 // });
-
 
 
 //  fanSpeedSlider.addEventListener("input", function() {
@@ -71,7 +70,6 @@
 //  }
 
 
- 
 //  function submitForm() {
 //     alert('空调状态已设置!');
 //     return true;
@@ -103,7 +101,7 @@ function enableControls() {
 // 初始化禁用控件
 disableControls();
 
-temperatureSlider.addEventListener("input", function() {
+temperatureSlider.addEventListener("input", function () {
     if (isACOn) {
         temperatureValue.innerText = temperatureSlider.value + "°C";
     } else {
@@ -112,7 +110,7 @@ temperatureSlider.addEventListener("input", function() {
     }
 });
 
-fanSpeedSlider.addEventListener("input", function() {
+fanSpeedSlider.addEventListener("input", function () {
     if (isACOn) {
         var fanSpeed = fanSpeedSlider.value;
         fanSpeedValue.innerText = fanSpeed === "1" ? "低风" : fanSpeed === "2" ? "中风" : "高风";
@@ -122,7 +120,7 @@ fanSpeedSlider.addEventListener("input", function() {
     }
 });
 
-modeSelector.addEventListener("change", function() {
+modeSelector.addEventListener("change", function () {
     if (!isACOn) {
         this.value = this.getAttribute('data-prev');
         alert('空调未开启！');
@@ -140,6 +138,7 @@ function toggleAC() {
         acToggleBtn.textContent = "关闭";
         acStatusText.textContent = "空调已开启";
         enableControls();
+
     } else {
         acToggleBtn.textContent = "开启";
         acStatusText.textContent = "空调已关闭";
@@ -158,9 +157,8 @@ function submitForm() {
 }
 
 
-
- //退房函数
- document.getElementById('checkout').addEventListener('click', function(event) {
+//退房函数
+document.getElementById('checkout').addEventListener('click', function (event) {
     event.preventDefault(); // 阻止链接默认行为
     if (confirm('确定要退房吗？')) {
         // 用户确认退房
@@ -168,13 +166,13 @@ function submitForm() {
             method: 'POST', // 或者你需要的方法
             // 其他请求参数
         })
-        .then(response => response.json())
-        .then(data => {
-            // 处理返回的数据
-            console.log(data);
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
+            .then(response => response.json())
+            .then(data => {
+                // 处理返回的数据
+                console.log(data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     }
 });

@@ -53,7 +53,6 @@ class Queue(View):
 
 class ServingQueue(Queue):
     serving_num = 0
-    queue_type = 1
 
     def insert(self, room, queue_type):
         super().insert(room, queue_type=queue_type)
@@ -70,7 +69,6 @@ class ServingQueue(Queue):
 
 class WaitingQueue(Queue):
     waiting_num = 0
-    queue_type = 2
 
     def insert(self, room, queue_type):
         super().insert(room, queue_type=queue_type)

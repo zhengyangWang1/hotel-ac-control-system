@@ -53,8 +53,8 @@ class Queue(View):
 
 class ServingQueue(Queue):
     serving_num = 0
-    queue_type = 1  # 1为服务状态
-    def insert(self, room, queue_type):
+
+    def insert(self, room, queue_type=1):
         super().insert(room, queue_type=queue_type)
         self.serving_num += 1
         return True
@@ -69,9 +69,8 @@ class ServingQueue(Queue):
 
 class WaitingQueue(Queue):
     waiting_num = 0
-    queue_type = 2  # 2为等待状态
 
-    def insert(self, room, queue_type):
+    def insert(self, room, queue_type=2):
         super().insert(room, queue_type=queue_type)
         self.waiting_num += 1
         return True
@@ -254,26 +253,6 @@ class Scheduler(View):  # 在views里直接创建
 
         # 达到目标温度后待机的房间启动回温算法
 
-    def back_temp(self, room, mode):  # mode=1制热 mode=2制冷,回温算法0.5℃/min，即0.008℃/s
-        if room.state == 4:
-            if mode == 1:  # 制热，房间温度高于室温
-                room.current_temp -= 0.008
-                if abs(room.target_temp - room.current_temp) > 1:    # ？？？
-                    if self.SQ.serving_num < 3:  # 服务队列没满
-                        self.SQ.insert(room)
-                    else:
-                        self.WQ.insert(room)
-                timer = threading.Timer(1, self.back_temp, [room, 1])  # 每1秒执行一次函数
-                timer.start()
-            else:  # 制冷，房间温度低于室温
-                room.current_temp += 0.008
-                if abs(room.target_temp - room.current_temp) > 1 and room.current_temp > room.target_temp:
-                    if self.SQ.serving_num < 3:  # 服务队列没满
-                        self.SQ.insert(room)
-                    else:
-                        self.WQ.insert(room)
-                timer = threading.Timer(1, self.back_temp, [room, 2])  # 每1秒执行一次函数
-                timer.start()
 
     def scheduling(self):
         # 资源足够的情况

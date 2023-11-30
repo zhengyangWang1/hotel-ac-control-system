@@ -52,7 +52,7 @@
     <div class="control-panel">
         <h1>空调控制系统</h1>
 
-        <from id="airCondition_panel" action="{url 'check_status' %}" method="post"> 
+        <!-- <from id="airCondition_panel" action="{url 'check_status' %}" method="post">  -->
             <div class="room-number">
                 <h2>房间号</h2>
                 <h2 id="displayRoomNumber"></h2>
@@ -65,15 +65,52 @@
                 <h2>{{user_id}}</h2>
             </div>
 
-            <div class="ac-status">
+            <!-- <div class="ac-status">
                 <h2>空调状态</h2>
                 <p id="ac-status-text">空调已关闭</p>
                 <button type="button" id="ac-toggle" onclick="toggleAC()">开启</button>  
             
                 <input type="hidden" id="ac-state" name="ac_state" value="off">
+            </div> -->
+
+{#            <form id="ac_control_panel" action="" method="post">#}
+{#                <input type="hidden" name="room_id" value="{{ room_id }}">#}
+{#                <input type="hidden" id="ac-state" name="ac_state" value="off">#}
+{#            #}
+{#                <div class="ac-status">#}
+{#                    <h2>空调状态</h2>#}
+{#                    <p id="ac-status-text">空调已关闭</p>#}
+{#                    <button type="button" id="ac-toggle" onclick="toggleAC()">开启空调</button>#}
+{#                </div>#}
+{#            </form>#}
+            
+            <!-- 开启空调的表单 -->
+            <div>
+            <form id="ac_open_panel" action="{% url 'open_ac' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="room_id" value="{{ room_id }}">
+
+                <div class="ac-status">
+                    <h2>空调状态</h2>
+                    <p id="ac-status-text">空调已关闭</p >
+                    <button type="submit">开启空调</button>
+                </div>
+            </form>
             </div>
 
-            <div class="control-container">
+
+            <!-- 关闭空调的表单 -->
+            <div>
+            <form id="ac_close_panel" action="{% url 'close_ac' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="room_id" value="{{ room_id }}">
+
+                <div class="ac-status">
+                    <button type="submit">关闭空调</button>
+                </div>
+            </form>
+            </div>
+            <!-- <div class="control-container">
                 <div class="temperature-control">
                     <h2>温度</h2>
                     <div class="temperature-display">
@@ -98,10 +135,45 @@
                         <option value="fan">送风</option>
                     </select>
                 </div>
-            </div>
+            </div> --> 
 
-            <button type="submit" onclick="return submitForm()">确定修改</button>
-        </from>
+            <form id="ac_temperature_control" action="{url 'ac_temp_control'}" method="post">
+                <input type="hidden" name="room_id" value="{{ room_id }}">
+            
+                <div class="control-container">
+                    <div class="temperature-control">
+                        <h2>温度</h2>
+                        <div class="temperature-display">
+                            <span id="temperature">22°C</span>
+                        </div>
+                        <input type="range" id="temperature-slider" name="temperature" min="16" max="30" value="22" step="1">
+                    </div>
+            
+                    <div class="fan-speed-control">
+                        <h2>风速</h2>
+                        <div class="fan-speed-display">
+                            <span id="fan-speed">中风</span>
+                        </div>
+                        <input type="range" id="fan-speed-slider" name="fan_speed" min="1" max="3" value="2" step="1">
+                    </div>
+
+                    <div class="mode-control">
+                        <h2>模式</h2>
+                        <select id="mode-selector" name="mode">
+                            <option value="cool">制冷</option>
+                            <option value="heat">制热</option>
+                            <option value="fan">送风</option>
+                        </select>
+                    </div>
+
+                </div>
+            
+                <button type="submit">应用温度和风速设置</button>
+            </form>
+            
+
+            <!-- <button type="submit" onclick="return submitForm()">确定修改</button> -->
+        <!-- </from> -->
 
         <div class="status-container">
 

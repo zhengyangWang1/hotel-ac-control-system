@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
 from manager import models
@@ -10,6 +10,8 @@ from django.utils import timezone
 from django.views import View
 from threading import Timer
 from user.models import Room
+
+# import numpy as np
 
 # Create your views here.
 class Queue(View):
@@ -82,83 +84,6 @@ class WaitingQueue(Queue):
     def update_waiting_time(self):
         super().update_time(queue_type=2)
 
-# class ServingQueue(View):
-#     room_list = []
-#     serving_num = 0
-#
-#     def insert(self, room):
-#         room.state = 1
-#         room.scheduling_num += 1
-#         self.room_list.append(room)
-#         self.room_list.sort(key=lambda x: x.fan_speed)  # 按照风速排列
-#         self.serving_num += 1
-#         return True
-#
-#     def set_target_temp(self, room_id, target_temp):
-#         for room in self.room_list:
-#             if room.room_id == room_id:
-#                 room.target_temp = target_temp
-#                 break
-#         return True
-#
-#     def set_fan_speed(self, room_id, fan_speed):
-#         for room in self.room_list:
-#             if room.room_id == room_id:
-#                 room.fan_speed = fan_speed
-#                 self.room_list.sort(key=lambda x: x.fan_speed)  # 按照风速排序，服务队列中风速优先
-#                 break
-#         return True
-#
-#     def delete(self, room):
-#         self.room_list.remove(room)
-#         self.serving_num -= 1
-#         return True
-#
-#     def update_serve_time(self):
-#         if self.serving_num != 0:
-#             for room in self.room_list:
-#                 room.serve_time += 1
-#         timer = Timer(60, self.update_serve_time)  # 每1min执行一次函数
-#         timer.start()
-#
-# class WaitingQueue(View):
-#     room_list = []
-#
-#     waiting_num = 0
-#
-#     def Insert(self, room):
-#         room.state = 2
-#         room.scheduling_num += 1
-#         self.room_list.append(room)
-#         self.waiting_num += 1
-#         return True
-#
-#     def set_target_temp(self, room_id, target_temp):
-#         for room in self.room_list:
-#             if room.room_id == room_id:
-#                 room.target_temp = target_temp
-#                 break
-#         return True
-#
-#     def set_fan_speed(self, room_id, fan_speed, fee_rate):
-#         for room in self.room_list:
-#             if room.room_id == room_id:
-#                 room.fan_speed = fan_speed
-#                 room.fee_rate = fee_rate
-#                 break
-#         return True
-#
-#     def Delete(self, room):
-#         self.room_list.remove(room)
-#         self.waiting_num -= 1
-#         return True
-#
-#     def update_waiting_time(self):
-#         if self.waiting_num != 0:
-#             for room in self.room_list:
-#                 room.wait_time += 1
-#         timer = Timer(60, self.update_waiting_time)  # 每1min执行一次函数
-#         timer.start()
 
 class Scheduler(View):  # 在views里直接创建
     def __init__(self, *args, **kwargs):
@@ -206,7 +131,7 @@ class Scheduler(View):  # 在views里直接创建
         else:
             self.WQ.insert(return_room)  # 进入等待队列 state = 2
 
-        return_room.request_time = timezone.now()  # 数据库room表没有request_time项
+
         return_room.request_id = self.request_id
         self.request_id += 1
         return_room.operation = 3
@@ -262,6 +187,71 @@ class Scheduler(View):  # 在views里直接创建
                     i += 1
                 return room
 
+   # 用户调温
+    def change_target_temp(self, room_id, target_temp):
+        if target_temp < 18:
+            target_temp = 18
+        if target_temp > 28:
+            target_temp = 28
+            for room in self.rooms:
+                if room.room_id == room_id:
+                    if room.state == 1:  # 在调度队列中
+                        self.SQ.set_target_temp(room_id, target_temp)
+                    elif room.state == 2:  # 在等待队列中
+                        self.WQ.set_target_temp(room_id, target_temp)
+                    else:
+                        room.target_temp = target_temp
+
+                        # 写入数据库
+                        room.request_id = self.request_id
+                        self.request_id += 1
+                        room.operation = 1
+                        room.request_time = timezone.now()
+                        room.save(force_insert=True)
+
+                        return room
+
+  # 用户调整风速
+    def change_fan_speed(self, room_id, fan_speed):
+        """
+        处理调风请求
+        :param room_id:
+        :param fan_speed:
+        :return:
+        """
+        if fan_speed == 1:
+            fee_rate = self.l_rate_fee # 低风速时的费率
+        elif fan_speed == 2:
+            fee_rate = self.m_rate_fee  # 中风速时的费率
+        elif fan_speed == 1:
+            fee_rate = self.h_rate_fee
+        for room in self.rooms:
+            if room.room_id == room_id:
+                if room.state == 1:  # 在调度队列中
+                    self.SQ.set_fan_speed(room_id, fan_speed)
+                elif room.state == 2:  # 在等待队列中
+                    self.WQ.set_fan_speed(room_id, fan_speed)
+                else:
+                    room.fan_speed = fan_speed
+                # 写入数据库
+                room.request_id = self.request_id
+                self.request_id += 1
+                room.operation = 2
+                room.request_time = timezone.now()
+                room.save(force_insert=True)
+
+                return room
+
+  # 用户开关机更新房间状态
+    def update_room_state(self, room_id):
+        '''
+        1
+        '''
+    def check_room_state(self):
+        '''
+        用于管理员检测房间状态
+        '''
+
     def scheduling(self):
         # 资源足够的情况
         if len(self.WQ.room_list) != 0 and len(self.SQ.room_list) < 3:
@@ -310,12 +300,12 @@ class Scheduler(View):  # 在views里直接创建
 
     # 时间片调度
     def time_slice_scheduling(self, request_room):
-        request_room.wait_time = 120  # 分配等待服务时长
-        request_room.update_wait_time()  # 可能要再实现一个更新，是等待时长递减
+        clock = 120
 
         #  奇奇怪怪 是要每一个房间都分配一个服务时间好像
+        # 不太对
 
-        while True:
+        while clock != 0:
             if self.check_condition():
                 min_wait_serve_time_room = min(self.WQ.room_list, key=lambda x: x.wait_serve_time)
                 self.WQ.delete(min_wait_serve_time_room)
@@ -323,16 +313,20 @@ class Scheduler(View):  # 在views里直接创建
                 min_wait_serve_time_room.wait_time = 0
                 break
 
-            elif request_room.wait_time <= 0:
-                # 没有服务状态变化，释放服务队列中服务时长最大的服务对象
-                max_serve_time_room = max(self.SQ.room_list, key=lambda x: x.serve_time)
-                self.SQ.delete(max_serve_time_room)
-                self.WQ.insert(max_serve_time_room)
-                self.SQ.insert(request_room)
-                request_room.serve_time = 0
-                max_serve_time_room.wait_time = 0  # 分配等待服务时长
-                break
+            else:
+                clock -= 1
             time.sleep(1)
+
+        # 判断是如何跳出循环的
+        if clock <= 0:
+            # 没有服务状态变化，释放服务队列中服务时长最大的服务对象
+            max_serve_time_room = max(self.SQ.room_list, key=lambda x: x.serve_time)
+            self.SQ.delete(max_serve_time_room)
+            self.WQ.insert(max_serve_time_room)
+            self.SQ.insert(request_room)
+            request_room.serve_time = 0
+            max_serve_time_room.wait_time = 0  # 分配等待服务时长
+
 
     def check_condition(self):  # 时间片轮转跳出条件
         if any(self.check_target_arrive or room.state == 3 for room in self.SQ.room_list):  # 还没实现达到温度与关机函数
@@ -347,10 +341,176 @@ class Scheduler(View):  # 在views里直接创建
                     # 后面要启动回温 未实现
                     return True
 
-class Sever(View):
-    1
-
-
-
 def login(request):
     return render(request, 'manager_login.html')
+
+
+
+# ===============类================
+class RoomCounter:  # 分配房间号
+    num = 0
+    dic = {}
+
+
+class RoomInfo:  # Room->字典
+    dic = {
+        "target_temp": "--",
+        "init_temp": "--",
+        "current_temp": "--",
+        "fan_speed": "--",
+        "fee": 0,
+        "room_id": 0
+    }
+
+    def __init__(self, room):
+        self.dic["target_temp"] = room.target_temp
+        self.dic["init_temp"] = room.init_temp
+        self.dic["current_temp"] = int(room.current_temp)
+        self.dic["fan_speed"] = speed_ch[room.fan_speed]
+        self.dic["fee"] = int(room.fee)
+        self.dic["room_id"] = room.room_id
+
+
+class RoomsInfo:  # 监控器使用
+    def __init__(self, rooms):
+        self.dic = {
+            "room_id": [0],
+            "state": [""],
+            "fan_speed": [""],
+            "current_temp": [0],
+            "fee": [0],
+            "target_temp": [0],
+            "fee_rate": [0]
+        }
+        if rooms:
+            for room in rooms:  # 从1号房开始
+                self.dic["room_id"].append(room.room_id)
+                self.dic["state"].append(state_ch[room.state])
+                self.dic["fan_speed"].append(speed_ch[room.fan_speed])
+                self.dic["current_temp"].append('%.2f' % room.current_temp)
+                self.dic["fee"].append('%.2f' % room.fee)
+                self.dic["target_temp"].append(room.target_temp)
+                self.dic["fee_rate"].append(room.fee_rate)
+
+
+class RoomBuffer:  # 房间数据缓存
+    on_flag = [None, False, False, False, False, False]
+    target_temp = [0, 25, 25, 25, 25, 25]  # 不要用数组。。。。
+    init_temp = [0, 32, 28, 30, 29, 35]
+
+
+class ChartData:
+    open_time = []  # 五个房间的开机时长
+    record_num = 0  # 详单数
+    schedule_num = 0  # 调度次数
+    open_num = []  # 五个房间的*开机次数*
+    change_temp_num = []  # 五个房间的调温次数
+    change_fan_num = []  # 五个房间的调风速次数
+    # ---numpy---
+    # fee = np.zeros([6, 30])  # 五个房间，30分钟内费用 + 30分钟内总费用
+
+
+# ============静态变量===========
+room_c = RoomCounter  # 静态
+room_info = RoomInfo
+scheduler = Scheduler()  # 属于model模块
+room_b = RoomBuffer
+speed_ch = ["", "高速", "中速", "低速"]
+state_ch = ["", "服务中", "等待", "关机", "休眠"]
+
+
+# ===============================
+
+
+# ================函数 <顾客界面>  ==============
+def get_room_id(request):
+    s_id = request.session.session_key
+    if s_id is None:
+        request.session.create()
+        s_id = request.session.session_key
+
+    if s_id not in room_c.dic:
+        room_c.num = room_c.num + 1
+        room_c.dic[s_id] = room_c.num
+        return room_c.num
+    else:
+        return room_c.dic[s_id]
+
+
+def client_off(request):  # 第一次访问客户端界面、开机
+    room_id = get_room_id(request)
+    room = scheduler.update_room_state(room_id)
+    if room:  # -----------之所以要判断，是因为第一次访问页面，room有未创建的风险
+        return render(request, 'client-off.html', RoomInfo(room).dic)
+    else:  # 妹有room实例
+        return render(request, 'client-off.html', room_info.dic)
+
+
+def client_on(request):
+    room_id = get_room_id(request)
+    room = scheduler.update_room_state(room_id)
+    return render(request, 'client-on.html', RoomInfo(room).dic)
+
+
+def power(request):  # 客户端-电源键
+    room_id = get_room_id(request)
+    if not room_b.on_flag[room_id]:
+        room_b.on_flag[room_id] = True  # 开机
+        scheduler.request_on(room_id, room_b.init_temp[room_id])  # 创建room对象
+        scheduler.set_init_temp(room_id, room_b.init_temp[room_id])  # 这里初始温度，和requeston的温度一样，如何简化？
+        return HttpResponseRedirect('/on/')
+    else:
+        room_b.on_flag[room_id] = False  # 关机
+        scheduler.request_off(room_id)
+        return HttpResponseRedirect('/')
+
+
+def change_high(request):  # 高速
+    room_id = get_room_id(request)
+    if room_b.on_flag[room_id]:
+        scheduler.change_fan_speed(room_id, 1)
+        return HttpResponseRedirect('/on/')
+    else:
+        return HttpResponseRedirect('/')
+
+
+def change_mid(request):  # 中速
+    room_id = get_room_id(request)
+    if room_b.on_flag[room_id]:
+        scheduler.change_fan_speed(room_id, 2)
+        return HttpResponseRedirect('/on/')
+    else:
+        return HttpResponseRedirect('/')
+
+
+def change_low(request):  # 低速
+    room_id = get_room_id(request)
+    if room_b.on_flag[room_id]:
+        scheduler.change_fan_speed(room_id, 3)
+        return HttpResponseRedirect('/on/')
+    else:
+        return HttpResponseRedirect('/')
+
+
+def change_up(request):  # 升温
+    room_id = get_room_id(request)
+    if room_b.on_flag[room_id]:  # 这里target_temp如何保证和内核同步？
+        temperature = room_b.target_temp[room_id] + 1
+        room_b.target_temp[room_id] = temperature
+        scheduler.change_target_temp(room_id, temperature)
+        return HttpResponseRedirect('/on/')
+    else:
+        return HttpResponseRedirect('/')
+
+
+def change_down(request):  # 降温
+    room_id = get_room_id(request)
+    if room_b.on_flag[room_id]:
+        temperature = room_b.target_temp[room_id] - 1
+        room_b.target_temp[room_id] = temperature
+        scheduler.change_target_temp(room_id, temperature)
+        return HttpResponseRedirect('/on/')
+    else:
+        return HttpResponseRedirect('/')
+
+

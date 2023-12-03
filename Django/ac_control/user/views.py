@@ -66,14 +66,14 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
         room_state = '等待'
 
     context = {'room_state': room_state}
-    return render(request, 'tem_c2.html', context)
+    return JsonResponse(context)
 
 
 # 如果空调为等待状态，需要一个函数，监控空调状态，当状态变为服务时，将其加入服务队列，同时将前端状态相应改变
 def change_ac_state(request):
     room_id = request.POST.get('room_id')
     room = scheduler.rooms
-    room = models.Room.objects.get(room_id=room_id)
+    room = Room.objects.get(room_id=room_id)
     new_state = room.state  # 获取当前房间状态
     return JsonResponse({'room_id': room_id, 'new_state': new_state})
 
@@ -90,14 +90,15 @@ def close_ac(request):
 
 # 用户设定好温度和风速后点击确定
 def change_temp_wind(request):
-    room_id = request.POST.get('room_id')
-    temp = request.POST.get('temp')
-    wind_speed = request.POST.get('wind_speed')
-    # 更改AirCondition中空调的参数
-    ac = models.AirCondition.objects.get(room_id=room_id)
-    ac.temp = temp
-    ac.wind_speed = wind_speed
-    ac.save()  # 更新room表中的信息
+    room_id = request.POST.get('room_id')  # 没有room_id
+    temp = int(request.POST.get('temperature'))  # 前端传来时为str，需要转化为int
+    wind_speed = int(request.POST.get('fan_speed'))
+    print(room_id)
+    print(temp)
+    print(scheduler.rooms)
+    # 更新参数
+    scheduler.change_target_temp(room_id, temp)  # 改变room的target_temp属性，写入数据库
+    scheduler.change_fan_speed(room_id, wind_speed)  # 改变room的fan_speed属性，写入数据库
     return render(request, 'tem_c2.html')
 
 

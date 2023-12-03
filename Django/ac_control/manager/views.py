@@ -173,6 +173,7 @@ class Scheduler(View):  # 在views里直接创建
                     room.state = 3
                 # 写入数据库
                 room.request_id = self.request_id
+                self.request_id += 1
                 room.operation = 4
                 room.request_time = timezone.now()
                 room.save(force_insert=True)
@@ -191,8 +192,8 @@ class Scheduler(View):  # 在views里直接创建
     def change_target_temp(self, room_id, target_temp):
         if target_temp < 18:
             target_temp = 18
-        if target_temp > 28:
-            target_temp = 28
+        if target_temp > 25:
+            target_temp = 25
             for room in self.rooms:
                 if room.room_id == room_id:
                     if room.state == 1:  # 在调度队列中

@@ -5,7 +5,7 @@ var fanSpeedValue = document.getElementById("fan-speed");
 var modeSelector = document.getElementById("mode-selector");
 var acToggleBtn = document.getElementById("ac-toggle");
 var acStatusText = document.getElementById("ac-status-text");
-var isACOn = false;
+var isACOn = true;
 
 // 禁用控件
 function disableControls() {
@@ -23,6 +23,7 @@ function enableControls() {
 
 // 初始化禁用控件
 // disableControls();
+enableControls()
 
 temperatureSlider.addEventListener("input", function() {
     if (isACOn) {
@@ -129,3 +130,26 @@ function toggleAC() {
         });
     }
 });
+
+
+function updateStatus() {
+    // 使用fetch或其他AJAX方法发送请求
+    fetch('/change_ac_state/')
+        .then(response => response.json())
+        .then(data => {
+            // 假设服务器返回的数据格式是 { cur_tem: '...', cur_wind: '...', cost: '...', sum_cost: '...', ac_status: '...' }
+            document.getElementById('cur_tem').textContent = data.cur_tem;
+            document.getElementById('cur_wind').textContent = data.cur_wind;
+            document.getElementById('cost').textContent = data.cost;
+            document.getElementById('sum_cost').textContent = data.sum_cost;
+
+            // 更新空调状态
+            document.getElementById('ac-status-text').textContent = `空调已${data.ac_status}`;
+
+            // 其他更新逻辑...
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+// 设置定时器，每30秒调用一次updateStatus函数
+setInterval(updateStatus, 30000);

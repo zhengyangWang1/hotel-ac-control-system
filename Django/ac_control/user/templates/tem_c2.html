@@ -73,17 +73,7 @@
                 <input type="hidden" id="ac-state" name="ac_state" value="off">
             </div> -->
 
-{#            <form id="ac_control_panel" action="" method="post">#}
-{#                <input type="hidden" name="room_id" value="{{ room_id }}">#}
-{#                <input type="hidden" id="ac-state" name="ac_state" value="off">#}
-{#            #}
-{#                <div class="ac-status">#}
-{#                    <h2>空调状态</h2>#}
-{#                    <p id="ac-status-text">空调已关闭</p>#}
-{#                    <button type="button" id="ac-toggle" onclick="toggleAC()">开启空调</button>#}
-{#                </div>#}
-{#            </form>#}
-            
+
             <!-- 开启空调的表单 -->
             <div>
             <form id="ac_open_panel" action="{% url 'open_ac' %}" method="post">
@@ -92,7 +82,7 @@
 
                 <div class="ac-status">
                     <h2>空调状态</h2>
-                    <p id="ac-status-text">空调已关闭</p >
+                    <p id="room_state">{{空调已关闭}}</p >
                     <button type="submit">开启空调</button>
                 </div>
             </form>
@@ -137,7 +127,8 @@
                 </div>
             </div> --> 
 
-            <form id="ac_temperature_control" action="{url 'ac_temp_control'}" method="post">
+            <form id="ac_temperature_control" action="{% url 'change_temp_wind' %}" method="post">
+                {% csrf_token %}
                 <input type="hidden" name="room_id" value="{{ room_id }}">
             
                 <div class="control-container">

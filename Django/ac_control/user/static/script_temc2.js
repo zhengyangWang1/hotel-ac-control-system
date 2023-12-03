@@ -5,7 +5,7 @@ var fanSpeedValue = document.getElementById("fan-speed");
 var modeSelector = document.getElementById("mode-selector");
 var acToggleBtn = document.getElementById("ac-toggle");
 var acStatusText = document.getElementById("ac-status-text");
-var isACOn = false;
+var isACOn = true;
 
 // 禁用控件
 function disableControls() {
@@ -23,6 +23,7 @@ function enableControls() {
 
 // 初始化禁用控件
 // disableControls();
+enableControls()
 
 temperatureSlider.addEventListener("input", function() {
     if (isACOn) {
@@ -133,7 +134,7 @@ function toggleAC() {
 
 function updateStatus() {
     // 使用fetch或其他AJAX方法发送请求
-    fetch('后端状态更新URL')
+    fetch('/change_ac_state/')
         .then(response => response.json())
         .then(data => {
             // 假设服务器返回的数据格式是 { cur_tem: '...', cur_wind: '...', cost: '...', sum_cost: '...', ac_status: '...' }

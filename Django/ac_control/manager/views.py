@@ -237,8 +237,8 @@ class Scheduler(View):  # 在views里直接创建
     def change_target_temp(self, room_id, target_temp):
         if target_temp < 18:
             target_temp = 18
-        if target_temp > 28:
-            target_temp = 28
+        if target_temp > 25:
+            target_temp = 25
             for room in self.rooms:
                 if room.room_id == room_id:
                     if room.state == 1:  # 在调度队列中

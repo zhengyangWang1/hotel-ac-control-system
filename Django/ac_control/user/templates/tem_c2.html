@@ -127,7 +127,8 @@
                 </div>
             </div> --> 
 
-            <form id="ac_temperature_control" action="{url 'ac_temp_control'}" method="post">
+            <form id="ac_temperature_control" action="{% url 'change_temp_wind' %}" method="post">
+                {% csrf_token %}
                 <input type="hidden" name="room_id" value="{{ room_id }}">
             
                 <div class="control-container">

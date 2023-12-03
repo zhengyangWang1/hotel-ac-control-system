@@ -68,7 +68,6 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
     context = {'room_state': room_state}
     return render(request, 'tem_c2.html', context)
 
-
 # 如果空调为等待状态，需要一个函数，监控空调状态，当状态变为服务时，将其加入服务队列，同时将前端状态相应改变
 def change_ac_state(request):
     room_id = request.POST.get('room_id')
@@ -76,7 +75,6 @@ def change_ac_state(request):
     room = models.Room.objects.get(room_id=room_id)
     new_state = room.state  # 获取当前房间状态
     return JsonResponse({'room_id': room_id, 'new_state': new_state})
-
 
 # 用户点击关机
 def close_ac(request):

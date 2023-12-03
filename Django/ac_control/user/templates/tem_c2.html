@@ -55,15 +55,22 @@
         <!-- <from id="airCondition_panel" action="{url 'check_status' %}" method="post">  -->
             <div class="room-number">
                 <h2>房间号</h2>
-                <h2 id="displayRoomNumber"></h2>
+                <h2 id="room_id"></h2>
                 <h2>{{room_id}}</h2>
             </div>
 
             <div class="room-number">
                 <h2>房间客户</h2>
-                <h2 id="displayRoomNumber"></h2>
+                <h2 id="user_id"></h2>
                 <h2>{{user_id}}</h2>
             </div>
+
+           <div class="room-number">
+                <h2>空调状态</h2>
+                <h2 id="room_state"></h2>
+                <h2>{{room_state}}</h2>
+            </div>
+
 
             <!-- <div class="ac-status">
                 <h2>空调状态</h2>
@@ -79,10 +86,9 @@
             <form id="ac_open_panel" action="{% url 'open_ac' %}" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="room_id" value="{{ room_id }}">
+                <input type="hidden" name="user_id" value="{{ user_id }}">
 
                 <div class="ac-status">
-                    <h2>空调状态</h2>
-                    <p id="room_state">{{空调已关闭}}</p >
                     <button type="submit">开启空调</button>
                 </div>
             </form>
@@ -94,6 +100,7 @@
             <form id="ac_close_panel" action="{% url 'close_ac' %}" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="room_id" value="{{ room_id }}">
+                <input type="hidden" name="user_id" value="{{ user_id }}">
 
                 <div class="ac-status">
                     <button type="submit">关闭空调</button>
@@ -130,6 +137,7 @@
             <form id="ac_temperature_control" action="{% url 'change_temp_wind' %}" method="post">
                 {% csrf_token %}
                 <input type="hidden" name="room_id" value="{{ room_id }}">
+                <input type="hidden" name="user_id" value="{{ user_id }}">
             
                 <div class="control-container">
                     <div class="temperature-control">

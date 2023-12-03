@@ -9,7 +9,7 @@ from django.db import models
 from django.utils import timezone
 from django.db.models import Sum
 from datetime import timedelta
-# from dateutil.relativedelta import relativedelta
+from dateutil.relativedelta import relativedelta
 import csv
 import os
 
@@ -56,6 +56,7 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
     """获取request中的用户信息和空调数据"""
 
     room_id = request.POST.get('room_id')
+    user_id = request.POST.get('username')
     room = scheduler.request_on(room_id, 26)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
 
     if room.state == 1:
@@ -65,8 +66,10 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
         # 等待资源中
         room_state = '等待'
 
-    context = {'room_state': room_state}
-    return JsonResponse(context)
+
+    context = {'room_id': room_id, 'user_id': user_id, ' room_state': room_state, 'cur_tem': room.current_temp,
+               'cur_wind': room.fan_speed, 'sum_cost': room.fee}
+    return render(request, 'tem_c2.html', context)
 
 # 如果空调为等待状态，需要一个函数，监控空调状态，当状态变为服务时，将其加入服务队列，同时将前端状态相应改变
 def change_ac_state(request):
@@ -80,24 +83,27 @@ def change_ac_state(request):
 def close_ac(request):
     """把room对象从room_list中移除"""
     room_id = request.POST.get('room_id')
+    user_id = request.POST.get('user_id')
     room = scheduler.request_off(room_id)
     room_state = '关机'
-    context = {'room_state': room_state}
+    context = {'room_id': room_id, 'user_id': user_id, 'room_state': room_state}
     return render(request, 'tem_c2.html', context)
 
 
 # 用户设定好温度和风速后点击确定
 def change_temp_wind(request):
+    # 获取表单数据
     room_id = request.POST.get('room_id')  # 没有room_id
+    user_id = request.POST.get('user_id')
     temp = int(request.POST.get('temperature'))  # 前端传来时为str，需要转化为int
     wind_speed = int(request.POST.get('fan_speed'))
-    print(room_id)
-    print(temp)
-    print(scheduler.rooms)
+    room = Room.objects.get(room_id=room_id)
     # 更新参数
     scheduler.change_target_temp(room_id, temp)  # 改变room的target_temp属性，写入数据库
     scheduler.change_fan_speed(room_id, wind_speed)  # 改变room的fan_speed属性，写入数据库
-    return render(request, 'tem_c2.html')
+    context = {'room_id': room_id, 'user_id': user_id, ' room_state': room.state, 'cur_tem': room.current_temp,
+               'cur_wind': room.fan_speed, 'sum_cost': room.fee}
+    return render(request, 'tem_c2.html', context)
 
 
 class Bills:

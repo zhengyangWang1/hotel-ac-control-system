@@ -31,6 +31,7 @@ class Queue(View):
         for room in self.room_list:
             if room.room_id == room_id:
                 room.target_temp = target_temp
+                room.save()
                 break
         return True
 
@@ -38,6 +39,7 @@ class Queue(View):
         for room in self.room_list:
             if room.room_id == room_id:
                 room.fan_speed = fan_speed
+                room.save()
                 self.room_list.sort(key=lambda x: x.fan_speed)  # 按照风速排序，服务队列中风速优先
                 break
         return True
@@ -66,7 +68,6 @@ class ServingQueue(Queue):
         super().delete(room)
         self.serving_num -= 1
         room.sever_over_time = django.utils.timezone.now
-        room.save(force_update=True)
         return True
 
     def update_serve_time(self):
@@ -249,6 +250,9 @@ class Scheduler(View):  # 在views里直接创建
                         room.target_temp = target_temp
 
                         # 写入数据库
+                        room.target_temp = target_temp
+                        room.request_id = self.request_id
+                        self.request_id += 1
                         room.operation = 1
                         room.request_time = timezone.now()
                         room.save(force_insert=True)
@@ -267,7 +271,7 @@ class Scheduler(View):  # 在views里直接创建
             fee_rate = self.l_rate_fee # 低风速时的费率
         elif fan_speed == 2:
             fee_rate = self.m_rate_fee  # 中风速时的费率
-        elif fan_speed == 1:
+        elif fan_speed == 3:
             fee_rate = self.h_rate_fee
         for room in self.rooms:
             if room.room_id == room_id:
@@ -278,6 +282,9 @@ class Scheduler(View):  # 在views里直接创建
                 else:
                     room.fan_speed = fan_speed
                 # 写入数据库
+                room.fan_speed = fan_speed
+                room.request_id = self.request_id
+                self.request_id += 1
                 room.operation = 2
                 room.request_time = timezone.now()
                 room.save(force_insert=True)

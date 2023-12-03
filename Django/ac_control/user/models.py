@@ -76,7 +76,7 @@ class Room(models.Model):
     # 目前的用户
     user_id = models.CharField('user_id', max_length=30)
     # 初始温度
-    init_temp = models.IntegerField('初始温度', null=False, default=0.0)
+    init_temp = models.IntegerField('初始温度', null=False, default=22.0)
     # 当前温度
     current_temp = models.IntegerField('当前温度', null=False, default=26.0)
     # 目标温度

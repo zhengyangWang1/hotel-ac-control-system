@@ -84,8 +84,7 @@ def close_ac(request):
     room_id = request.POST.get('room_id')
     room = scheduler.request_off(room_id)
     room_state = '关机'
-    context = {'room_state': room_state}
-    return render(request, 'tem_c2.html', context)
+    return JsonResponse({'room_state': room_state})  # 返回JSON响应
 
 
 # 用户设定好温度和风速后点击确定

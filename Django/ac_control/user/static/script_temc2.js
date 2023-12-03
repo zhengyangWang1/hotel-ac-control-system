@@ -132,6 +132,162 @@ function toggleAC() {
 });
 
 
+// JavaScript函数，处理开启和关闭空调的Ajax请求
+function handleAcAction_roomState(event) {
+    event.preventDefault();  // 阻止表单的默认提交行为
+
+    var form = event.target; // 获取触发事件的表单
+    var url = form.action;   // 表单的action属性指向后端的URL
+    var formData = new FormData(form); // 创建一个FormData对象，包含表单数据
+
+    fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCsrfToken() // 获取CSRF Token
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // 假设后端返回的数据包含room_state字段
+        document.getElementById('room_state').textContent = data.room_state;
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// 从cookie中获取CSRF Token
+function getCsrfToken() {
+    var name = 'csrftoken';
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// 添加事件监听器到表单
+document.getElementById('ac_open_panel').addEventListener('submit', handleAcAction_roomState);
+document.getElementById('ac_close_panel').addEventListener('submit', handleAcAction_roomState);
+
+
+
+
+
+
+
+
+
+function updateAcSettings(event) {
+    event.preventDefault();  // 阻止表单的默认提交行为
+
+    var form = event.target;
+    var formData = new FormData(form);
+    var actionUrl = form.action; // 获取表单的action URL
+
+    fetch(actionUrl, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCsrfToken2() // 获取CSRF Token
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // 这里可以根据返回的数据进行一些操作，比如更新页面元素或显示消息
+        console.log('Temperature and fan speed updated:', data);
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function getCsrfToken2() {
+    var name = 'csrftoken';
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// 将事件监听器绑定到温度和风速控制表单
+document.getElementById('ac_temperature_control').addEventListener('submit', updateAcSettings);
+
+
+
+
+
+
+// 获取CSRF Token的函数
+function getCsrfToken3() {
+    var name = 'csrftoken';
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// 处理空调设置表单的提交
+function AcSettingsAlert(event) {
+    event.preventDefault();  // 阻止表单的默认提交行为
+
+    var form = event.target;
+    var formData = new FormData(form);
+    var actionUrl = form.action; // 获取表单的action URL
+
+    fetch(actionUrl, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCsrfToken3() // 使用CSRF Token
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // 根据返回的数据判断操作是否成功，并给出提示
+        if (data.status === 'success') {
+            alert('空调设置成功！');
+        } else {
+            alert('空调设置失败：' + (data.message || '未知错误'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('请求过程中发生错误！');
+    });
+}
+
+// 绑定事件监听器到空调设置表单
+document.getElementById('ac_temperature_control').addEventListener('submit',  AcSettingsAlert);
+
+
+
+
 function updateStatus() {
     // 使用fetch或其他AJAX方法发送请求
     fetch('/change_ac_state/')

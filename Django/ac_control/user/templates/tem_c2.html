@@ -82,7 +82,7 @@
 
                 <div class="ac-status">
                     <h2>空调状态</h2>
-                    <p id="room_state">{{空调已关闭}}</p >
+                    <p id="room_state">{{room_state}}</p>
                     <button type="submit">开启空调</button>
                 </div>
             </form>
@@ -100,32 +100,7 @@
                 </div>
             </form>
             </div>
-            <!-- <div class="control-container">
-                <div class="temperature-control">
-                    <h2>温度</h2>
-                    <div class="temperature-display">
-                        <span id="temperature">22°C</span>
-                    </div>
-                    <input type="range" id="temperature-slider" name="temperature" min="16" max="30" value="22" step="1">
-                </div>
-
-                <div class="fan-speed-control">
-                    <h2>风速</h2>
-                    <div class="fan-speed-display">
-                        <span id="fan-speed">中风</span>
-                    </div>
-                    <input type="range" id="fan-speed-slider" name="fan_speed"  min="1" max="3" value="2" step="1">
-                </div>
-
-                <div class="mode-control">
-                    <h2>模式</h2>
-                    <select id="mode-selector" name="mode">
-                        <option value="cool">制冷</option>
-                        <option value="heat">制热</option>
-                        <option value="fan">送风</option>
-                    </select>
-                </div>
-            </div> --> 
+          
 
             <form id="ac_temperature_control" action="{% url 'change_temp_wind' %}" method="post">
                 {% csrf_token %}

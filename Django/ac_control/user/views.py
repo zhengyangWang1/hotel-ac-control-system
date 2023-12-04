@@ -12,6 +12,7 @@ from datetime import timedelta
 # from dateutil.relativedelta import relativedelta
 import csv
 import os
+import json
 
 # Create your views here.
 
@@ -41,7 +42,7 @@ def login_room(request):
 
         except User.DoesNotExist:
             # 如果用户不存在或密码不匹配，返回登录页面或其他提示页面
-            return render(request, 'login.html', '登陆失败')
+            return JsonResponse('登陆失败')
 
     return render(request, 'login.html')
 
@@ -56,6 +57,7 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
     """获取request中的用户信息和空调数据"""
 
     room_id = request.POST.get('room_id')
+    print(room_id)
     room = scheduler.request_on(room_id, 26)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
 
     if room.state == 1:
@@ -71,11 +73,24 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
 
 # 如果空调为等待状态，需要一个函数，监控空调状态，当状态变为服务时，将其加入服务队列，同时将前端状态相应改变
 def change_ac_state(request):
-    room_id = request.POST.get('room_id')
-    room = scheduler.rooms
-    room = Room.objects.get(room_id=room_id)
-    new_state = room.state  # 获取当前房间状态
-    return JsonResponse({'room_id': room_id, 'new_state': new_state})
+    # room_id = request.POST.get('room_id')
+    json_data = json.loads(request.body)
+
+    # 从 JSON 数据中获取 room_id
+    room_id = json_data.get('room_id')
+    print('从前端获得的room_id:', room_id)
+    target_room = None
+    # room = Room.objects.get(room_id=room_id)
+    print(scheduler.rooms)
+    for room in scheduler.rooms:
+        print('rooms中的room_id:', room.room_id)
+        if room.room_id == room_id:
+            new_state = room.state  # 获取当前房间状态
+            temp = room.current_temp
+            wind = room.fan_speed
+            cost = room.fee  # !只有一个费用
+    print('得到的对应房间的room_id:', room.room_id)
+    return JsonResponse({'cur_tem': temp, 'cur_wind': wind, 'cost': cost, 'sum_cost': cost, 'ac_status': new_state})
 
 
 # 用户点击关机
@@ -89,7 +104,7 @@ def close_ac(request):
 
 # 用户设定好温度和风速后点击确定
 def change_temp_wind(request):
-    room_id = request.POST.get('room_id')  # 没有room_id
+    room_id = request.POST.get('room_id')
     temp = int(request.POST.get('temperature'))  # 前端传来时为str，需要转化为int
     wind_speed = int(request.POST.get('fan_speed'))
     print(room_id)
@@ -98,7 +113,7 @@ def change_temp_wind(request):
     # 更新参数
     scheduler.change_target_temp(room_id, temp)  # 改变room的target_temp属性，写入数据库
     scheduler.change_fan_speed(room_id, wind_speed)  # 改变room的fan_speed属性，写入数据库
-    return render(request, 'tem_c2.html')
+    return JsonResponse({'status': 'success'})
 
 
 class Bills:

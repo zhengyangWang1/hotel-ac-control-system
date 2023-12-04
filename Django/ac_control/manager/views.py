@@ -94,7 +94,7 @@ class Scheduler(View):  # 在views里直接创建
         self.h_rate_fee = None
         self.m_rate_fee = None
         self.l_rate_fee = None
-        self.request_id = 1
+        # self.request_id = 1
         self.request_num = 0
         self.rooms = []  # 储存房间队列，最多有5个房间
 
@@ -132,10 +132,10 @@ class Scheduler(View):  # 在views里直接创建
             self.WQ.insert(return_room)  # 进入等待队列 state = 2
 
 
-        return_room.request_id = self.request_id
-        self.request_id += 1
+        # return_room.request_id = self.request_id
+        # self.request_id += 1
         return_room.operation = 3
-        return_room.save(force_insert=True)  # 存入数据库
+        return_room.save()  # 存入数据库
 
         return return_room
 
@@ -148,7 +148,8 @@ class Scheduler(View):  # 在views里直接创建
 
         # 如果房间不存在，创建一个新的房间对象
         if len(self.rooms) < 5:  # 控制只能有五个房间开机
-            new_room = Room(request_id=self.request_id, room_id=room_id, current_temp=current_temp)
+            # new_room = Room(request_id=self.request_id, room_id=room_id, current_temp=current_temp)
+            new_room = Room(room_id=room_id, current_temp=current_temp)  # 删除了request_id
             self.rooms.append(new_room)
             self.request_num += 1  # 发出第一次开机请求的房间数加一
             return new_room
@@ -172,11 +173,11 @@ class Scheduler(View):  # 在views里直接创建
                 else:
                     room.state = 3
                 # 写入数据库
-                room.request_id = self.request_id
-                self.request_id += 1
+                # room.request_id = self.request_id
+                # self.request_id += 1
                 room.operation = 4
                 room.request_time = timezone.now()
-                room.save(force_insert=True)
+                room.save()
 
                 # 开启资源充足的调度
                 severing_num = len(self.SQ.room_list)
@@ -204,11 +205,11 @@ class Scheduler(View):  # 在views里直接创建
                         room.target_temp = target_temp
 
                         # 写入数据库
-                        room.request_id = self.request_id
-                        self.request_id += 1
+                        # room.request_id = self.request_id
+                        # self.request_id += 1
                         room.operation = 1
                         room.request_time = timezone.now()
-                        room.save(force_insert=True)
+                        room.save()
 
                         return room
 
@@ -235,11 +236,11 @@ class Scheduler(View):  # 在views里直接创建
                 else:
                     room.fan_speed = fan_speed
                 # 写入数据库
-                room.request_id = self.request_id
-                self.request_id += 1
+                # room.request_id = self.request_id
+                # self.request_id += 1
                 room.operation = 2
                 room.request_time = timezone.now()
-                room.save(force_insert=True)
+                room.save()
 
                 return room
 

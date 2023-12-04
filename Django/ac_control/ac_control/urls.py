@@ -35,7 +35,8 @@ urlpatterns = [
     path('', user_views.login, name='login'),  # 将根路径映射到登录页面
 
     path('open_ac/', user_views.open_ac, name='open_ac'),
-
+    path('change_ac_state/', user_views.change_ac_state, name='change_ac_state'),
+    path('change_temp_wind/', user_views.change_temp_wind, name='change_temp_wind'),
     path('close_ac/', user_views.close_ac, name='close_ac'),
 
 ]

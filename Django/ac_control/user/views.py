@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponseRedirect
 from user import models
 import datetime
 from manager.views import Scheduler
@@ -14,10 +14,41 @@ import csv
 import os
 
 # Create your views here.
+class RoomsInfo:  # 监控器使用
+    def __init__(self, rooms):
+        self.dic = {
+            "room_id": [0],
+            "state": [""],
+            "fan_speed": [""],
+            "current_temp": [0],
+            "fee": [0],
+            "target_temp": [0],
+            "fee_rate": [0]
+        }
+        if rooms:
+            for room in rooms:  # 从1号房开始
+                self.dic["room_id"].append(room.room_id)
+                self.dic["state"].append(state_ch[room.state])
+                self.dic["fan_speed"].append(speed_ch[room.fan_speed])
+                self.dic["current_temp"].append('%.2f' % room.current_temp)
+                self.dic["fee"].append('%.2f' % room.fee)
+                self.dic["target_temp"].append(room.target_temp)
+                self.dic["fee_rate"].append(room.fee_rate)
+class RoomBuffer:  # 房间数据缓存
+    on_flag = [None, False, False, False, False, False]
+    target_temp = [0, 25, 25, 25, 25, 25]  # 不要用数组。。。。
+    init_temp = [0, 32, 28, 30, 29, 35]
+
+# ============静态变量===========
+room_b = RoomBuffer
+speed_ch = ["", "高速", "中速", "低速"]
+state_ch = ["", "服务中", "等待", "关机", "休眠"]
+
+
 
 scheduler = Scheduler()  # 创建一个调度器
 
-
+# ============客户===========
 def register(request):
     if request.method == 'POST':
         room_id = request.POST.get('roomNumber')
@@ -56,7 +87,8 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
     """获取request中的用户信息和空调数据"""
 
     room_id = request.POST.get('room_id')
-    room = scheduler.request_on(room_id, 26)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
+    user_id = request.POST.get('user_id')
+    room = scheduler.request_on(room_id, user_id, 24)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
 
     if room.state == 1:
         # 打开空调
@@ -85,7 +117,7 @@ def close_ac(request):
     room = scheduler.request_off(room_id)
     room_state = '关机'
     context = {'room_state': room_state}
-    return render(request, 'tem_c2.html', context)
+    return JsonResponse(context)
 
 
 # 用户设定好温度和风速后点击确定
@@ -93,13 +125,39 @@ def change_temp_wind(request):
     room_id = request.POST.get('room_id')  # 没有room_id
     temp = int(request.POST.get('temperature'))  # 前端传来时为str，需要转化为int
     wind_speed = int(request.POST.get('fan_speed'))
-    print(room_id)
-    print(temp)
-    print(scheduler.rooms)
     # 更新参数
     scheduler.change_target_temp(room_id, temp)  # 改变room的target_temp属性，写入数据库
     scheduler.change_fan_speed(room_id, wind_speed)  # 改变room的fan_speed属性，写入数据库
     return render(request, 'tem_c2.html')
+
+# ============管理员===========
+def init(request):
+    return render(request, 'init.html')
+
+def init_submit(request):
+    request.encoding = 'utf-8'
+    high = int(request.GET['high'])
+    low = int(request.GET['low'])
+    default = int(request.GET['default'])
+    fee_h = float(request.GET['fee_h'])
+    fee_m = float(request.GET['fee_m'])
+    fee_l = float(request.GET['fee_l'])
+    for i in range(1, 6):
+        room_b.init_temp[i] = int(request.GET['r' + str(i)])
+
+    print(room_b.init_temp)
+    scheduler.set_para(high, low, default, fee_h, fee_l, fee_m)
+    scheduler.power_on()
+    scheduler.start_up()
+    return HttpResponseRedirect('/monitor')
+
+def monitor(request):
+    rooms = scheduler.check_room_state()
+    print(rooms)
+    return render(request, 'monitor.html', RoomsInfo(rooms).dic)
+
+
+
 
 
 class Bills:

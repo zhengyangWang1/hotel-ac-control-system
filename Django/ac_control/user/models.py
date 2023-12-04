@@ -62,11 +62,11 @@ class Room(models.Model):
     # 请求号 主键 默认自增
     request_id = models.AutoField('operation_id', primary_key=True)
     # 请求时间
-    request_time = models.DateTimeField(verbose_name="请求发出时间", auto_now=True)
+    request_time = models.DateTimeField(verbose_name="请求发出时间", null=True)
     # 服务开始时间
-    sever_begin_time = models.DateTimeField(verbose_name="服务开始时间", auto_now_add=True)
+    sever_begin_time = models.DateTimeField(verbose_name="服务开始时间", null=True)
     # 服务结束时间
-    sever_over_time = models.DateTimeField(verbose_name="服务结束时间", auto_now_add=True)
+    sever_over_time = models.DateTimeField(verbose_name="服务结束时间", null=True)
     # 当前服务时长
     serve_time = models.IntegerField(verbose_name='当前服务时长', default=0)
     # 当前等待时长
@@ -74,7 +74,7 @@ class Room(models.Model):
     # 房间号
     room_id = models.CharField('room_id', max_length=10)
     # 目前的用户
-    user_id = models.CharField('user_id', max_length=30)
+    user_id = models.CharField('user_id', max_length=30, null=True)
     # 初始温度
     init_temp = models.IntegerField('初始温度', null=False, default=22.0)
     # 当前温度

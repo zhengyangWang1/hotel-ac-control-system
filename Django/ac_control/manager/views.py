@@ -118,7 +118,7 @@ class WaitingQueue(Queue):
         self.waiting_num -= 1
         return True
 
-    def update_waiting_time(self):
+    def update_wait_time(self):
         super().update_time(queue_type=2)
 
 
@@ -133,28 +133,34 @@ class Scheduler(View):  # 在views里直接创建
         self.l_rate_fee = None
         self.request_id = 1
         self.request_num = 0
+        self.default_target_temp = 0
         self.rooms = []  # 储存房间队列，最多有5个房间
 
         # 等待队列与服务队列
         self.SQ = ServingQueue()
         self.WQ = WaitingQueue()
-    def get(self, request):
-        '''
-        获取前台传参
-        主要有：温度范围，不同风速的费率
-        各已在后面传参的时候给
-        '''
 
-    def set_para(self, high_temp, low_temp, h_rate_fee, m_rate_fee, l_rate_fee):
+        STATE_CHOICE = [
+            (1, 'WORKING'),
+            (2, 'SHUTDOWN'),
+            (3, 'SETMODE'),
+            (4, 'READY')
+        ]
+
+        self.state = 2
+
+
+    def set_para(self, high_temp, low_temp, default, h_rate_fee, m_rate_fee, l_rate_fee):
         self.high_temp = high_temp
         self.low_temp = low_temp
+        self.default_target_temp = default
         self.h_rate_fee = h_rate_fee
         self.m_rate_fee = m_rate_fee
         self.l_rate_fee = l_rate_fee
         return True
 
     # 用户申请资源
-    def request_on(self, room_id, current_temp):  # 用户开机时调用
+    def request_on(self, room_id, user_id, current_temp):  # 用户开机时调用
         '''
         一个请求到来，第一次开机分配房间对象然后处理，否则直接处理
         调用调度算法
@@ -166,9 +172,11 @@ class Scheduler(View):  # 在views里直接创建
         for room in self.rooms:
             if room.room_id == room_id:  # 不是第一次开机，直接处理
                 room.current_temp = current_temp
+                room.user_id = user_id
                 flag = 0
                 if self.SQ.serving_num < 3:  # 服务队列未满
                     self.SQ.insert(room)
+                    room.sever_begin_time = timezone.now()
                 else:  # 服务队列已满
                     self.WQ.insert(room)
 
@@ -187,9 +195,11 @@ class Scheduler(View):  # 在views里直接创建
 
             temp_room.room_id = room_id
             temp_room.current_temp = current_temp
+            temp_room.user_id = user_id
             self.rooms.append(temp_room)
             if self.SQ.serving_num < 3:  # 服务队列未满
                 self.SQ.insert(temp_room)
+                temp_room.sever_begin_time = timezone.now()
             else:  # 服务队列已满
                 self.WQ.insert(temp_room)
 
@@ -199,7 +209,6 @@ class Scheduler(View):  # 在views里直接创建
             self.request_id += 1
             temp_room.operation = 3
             temp_room.save(force_insert=True)
-
         return return_room  # 返回房间的状态，目标温度，风速，费率以及费用
 
     # 用户关机
@@ -212,6 +221,7 @@ class Scheduler(View):  # 在views里直接创建
                 if room.state == 1:  # 服务队列中
                     room.state = 3
                     self.SQ.delete(room)
+                    room.sever_over_time = timezone.now()
                 if room.state == 2:  # 等待队列中
                     room.state = 3
                     self.WQ.delete(room)
@@ -309,6 +319,39 @@ class Scheduler(View):  # 在views里直接创建
         timer.start()
         return self.rooms
 
+    def power_on(self):
+        """
+        开启中控机，中控机状态修改为”SETMODE“
+        初始化房间队列
+        :return:
+        """
+        Room.objects.all().delete()
+        self.state = 3
+        #  只要服务队列有房间就计费和计温,制热mode=1,制冷mode=2,
+        if self.default_target_temp == 22:
+            self.SQ.auto_update_fee(1)
+        else:
+            self.SQ.auto_update_fee(2)
+
+        # 开启调度函数
+        self.scheduling()
+        #  只要有服务就检查是否有房间达到目标温度
+        self.check_target_arrive()
+        # 开启调度队列和等待队列的计时功能
+        self.SQ.update_serve_time()
+        self.WQ.update_wait_time()
+
+        return self.state
+
+    def start_up(self):
+        '''
+        参数设置完毕，进入READY状态
+        '''
+        self.state = 4
+        return self.state
+
+
+
     def back_temp(self, room):
         '''
         回温
@@ -399,8 +442,21 @@ class Scheduler(View):  # 在views里直接创建
                 if abs(room.current_temp - room.target_temp) < 0.1 or room.current_temp < room.target_temp:
                     room.state = 4
                     self.SQ.delete(room)
+                    room.sever_over_time = timezone.now()
                     # 后面要启动回温 未实现
                     return True
+        # 不懂下面这段什么意义
+        # if self.WQ.waiting_num != 0:
+        #     for room in self.WQ.room_list:
+        #         if abs(room.current_temp - room.target_temp) < 0.1 or room.current_temp < room.target_temp:
+        #             room.state = 4
+        #             self.WQ.delete_room(room)
+        #             if self.default_target_temp == 22:
+        #                 self.back_temp(room, 1)
+        #             else:
+        #                 self.back_temp(room, 2)
+        timer = threading.Timer(1, self.check_target_arrive)  # 每5秒执行一次check函数
+        timer.start()
 
 def login(request):
     return render(request, 'manager_login.html')

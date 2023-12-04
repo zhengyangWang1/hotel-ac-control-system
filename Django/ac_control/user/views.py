@@ -48,6 +48,15 @@ state_ch = ["", "服务中", "等待", "关机", "休眠"]
 
 
 scheduler = Scheduler()  # 创建一个调度器
+high = 25
+low = 18
+default = 24
+fee_h = 0.0016
+fee_l = 0.0016
+fee_m = 0.0016
+scheduler.set_para(high, low, default, fee_h, fee_l, fee_m)
+scheduler.power_on()
+scheduler.start_up()
 
 # ============客户===========
 def register(request):
@@ -147,11 +156,13 @@ def change_temp_wind(request):
     room_id = request.POST.get('room_id')
     temp = int(request.POST.get('temperature'))  # 前端传来时为str，需要转化为int
     wind_speed = int(request.POST.get('fan_speed'))
-    print(temp)
     # 更新参数
     scheduler.change_target_temp(room_id, temp)  # 改变room的target_temp属性，写入数据库
     scheduler.change_fan_speed(room_id, wind_speed)  # 改变room的fan_speed属性，写入数据库
     return JsonResponse({'status': 'success'})
+
+
+
 
 # ============管理员===========
 def init(request):
@@ -214,7 +225,7 @@ class Bills:
             return 0, 0
 
     @staticmethod
-    # 这个界面前面实现了在change_ac_state里，应该不用再实现
+    # 这个界面前面实现了在change_ac_state里，应该不用再实现了
     def current_status_return(request, user_id, room_id):
         '''
         交互————用户登录后的页面
@@ -249,9 +260,11 @@ class Bills:
         start_time, end_time = Bills.get_time(user_id, room_id)
         records = Room.objects.filter(room_id=room_id, request_time__range=(start_time, end_time)).order_by(
             '-request_time')
+        detail = []
         for r in records:
             dic = {}
             dic.update(
+                request_id=r.request_id,
                 request_time=r.request_time,
                 room_id=r.room_id,
                 operation=r.get_operation_display(),
@@ -259,25 +272,26 @@ class Bills:
                 target_temp=r.target_temp,
                 fan_speed=r.get_fan_speed_display(),
                 fee=r.fee)
-            detail[r.request_id] = dic
-        # detail是一个字典，以request_id作为键值，返回给前端
+            detail.appned(dic)
+
+        for d in detail:
+            print(d)
         return detail
 
     @staticmethod
-    def details(request, user_id, room_id):
-        '''
-        交互？————详单
-        '''
-        detail = Bills.get_details(user_id, room_id)
-        return render(request, 'xx.html', {'details': detail})
-
-    @staticmethod
-    def details_table(user_id, room_id):
-        '''
-        交互————打印出来的详单
-        '''
+    def print_details(user_id, room_id):
+        """
+        打印详单
+        :param room_id: 房间号
+        :param begin_date: 起始日期
+        :param end_date: endDay
+        :return:    返回详单字典列表
+        """
         rdr = Bills.get_details(user_id, room_id)
-        file_header = ["request_time",
+        import csv
+        # 文件头，一般就是数据名
+        file_header = ["request_id",
+                       "request_time",
                        "room_id",
                        "operation",
                        "current_temp",

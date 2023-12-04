@@ -61,7 +61,7 @@ class Room(models.Model):
     ]
 
     # 请求号 主键 默认自增
-    # request_id = models.AutoField('operation_id', primary_key=True)
+    request_id = models.AutoField('operation_id', primary_key=True)
     # 请求时间
     request_time = models.DateTimeField(verbose_name="请求发出时间", null=True)
     # 服务开始时间

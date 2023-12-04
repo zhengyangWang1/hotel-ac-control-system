@@ -12,6 +12,7 @@ from datetime import timedelta
 # from dateutil.relativedelta import relativedelta
 import csv
 import os
+import json
 
 # Create your views here.
 class RoomsInfo:  # 监控器使用
@@ -72,7 +73,7 @@ def login_room(request):
 
         except User.DoesNotExist:
             # 如果用户不存在或密码不匹配，返回登录页面或其他提示页面
-            return render(request, 'login.html', '登陆失败')
+            return JsonResponse('登陆失败')
 
     return render(request, 'login.html')
 
@@ -89,7 +90,6 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
     room_id = request.POST.get('room_id')
     user_id = request.POST.get('user_id')
     room = scheduler.request_on(room_id, user_id, 24)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
-
     if room.state == 1:
         # 打开空调
         room_state = '开启'
@@ -103,11 +103,33 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
 
 # 如果空调为等待状态，需要一个函数，监控空调状态，当状态变为服务时，将其加入服务队列，同时将前端状态相应改变
 def change_ac_state(request):
-    room_id = request.POST.get('room_id')
-    room = scheduler.rooms
-    room = Room.objects.get(room_id=room_id)
-    new_state = room.state  # 获取当前房间状态
-    return JsonResponse({'room_id': room_id, 'new_state': new_state})
+    # room_id = request.POST.get('room_id')
+    json_data = json.loads(request.body)
+    # 从 JSON 数据中获取 room_id
+    room_id = json_data.get('room_id')
+    target_room = None
+    temp = 0
+    wind = '中风'
+    cost = 0
+    new_state = '关机'
+    room = Room.objects.filter(room_id=room_id).order_by('-request_time')[0]
+    if room.state == 1:
+        new_state = '服务'
+    elif room.state == 2:
+        new_state = '等待'
+    elif room.state == 3:
+        new_state = '关机'
+    else:
+        new_state = '休眠'
+    if room.fan_speed == 1:
+        wind = '低风'
+    elif room.fan_speed == 2:
+        wind = '中风'
+    else:
+        wind = '高风'
+    temp = room.current_temp
+    cost = room.fee  # !只有一个费用
+    return JsonResponse({'cur_tem': temp, 'cur_wind': wind, 'cost': cost, 'sum_cost': cost, 'ac_status': new_state})
 
 
 # 用户点击关机
@@ -122,13 +144,14 @@ def close_ac(request):
 
 # 用户设定好温度和风速后点击确定
 def change_temp_wind(request):
-    room_id = request.POST.get('room_id')  # 没有room_id
+    room_id = request.POST.get('room_id')
     temp = int(request.POST.get('temperature'))  # 前端传来时为str，需要转化为int
     wind_speed = int(request.POST.get('fan_speed'))
+    print(temp)
     # 更新参数
     scheduler.change_target_temp(room_id, temp)  # 改变room的target_temp属性，写入数据库
     scheduler.change_fan_speed(room_id, wind_speed)  # 改变room的fan_speed属性，写入数据库
-    return render(request, 'tem_c2.html')
+    return JsonResponse({'status': 'success'})
 
 # ============管理员===========
 def init(request):
@@ -178,6 +201,7 @@ class Bills:
         而非每次开关机
         '''
         # -表示降序排列，找到最新的房间记录
+        # 这里有点问题，我们的数据库应该是只有一个fee，会累加更新，所以最新一条即为空调累计费用，不存在段费用 ？？？？？？
         records = Room.objects.filter(room_id=room_id).order_by('-request_time')
         if records:
             current_fee = records.first().fee
@@ -190,6 +214,7 @@ class Bills:
             return 0, 0
 
     @staticmethod
+    # 这个界面前面实现了在change_ac_state里，应该不用再实现
     def current_status_return(request, user_id, room_id):
         '''
         交互————用户登录后的页面
@@ -201,7 +226,7 @@ class Bills:
             status['current_speed'] = current_record.fan_speed
             status['target_temp'] = current_record.target_temp
             start_time, end_time = Bills.get_time(user_id, room_id)
-            status['current_fee'], status['history_fee'] = Bills.Bills.cal_fee(start_time, end_time, room_id)
+            status['current_fee'], status['history_fee'] = Bills.cal_fee(start_time, end_time, room_id)
         else:
             # 不知道有没有必要写
             status = {}

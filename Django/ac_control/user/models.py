@@ -37,6 +37,7 @@ class User(models.Model):
         db_table = 'User'
 
 # 储存所有房间的每个请求  详单表
+
 class Room(models.Model):
     # 风速范围
     FAN_SPEED = [
@@ -60,7 +61,7 @@ class Room(models.Model):
     ]
 
     # 请求号 主键 默认自增
-    request_id = models.AutoField('operation_id', primary_key=True)
+    # request_id = models.AutoField('operation_id', primary_key=True)
     # 请求时间
     request_time = models.DateTimeField(verbose_name="请求发出时间", default=django.utils.timezone.now)
     # 房间号
@@ -91,7 +92,6 @@ class Room(models.Model):
     # 指定表名
     class Meta:
         db_table = 'Room'
-
 
 
 

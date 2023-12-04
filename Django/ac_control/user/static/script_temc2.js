@@ -233,6 +233,6 @@ function updateStatus() {
 }
 
 // 设置定时器，每30秒调用一次updateStatus函数
-setInterval(updateStatus, 10000);
+setInterval(updateStatus, 1000);
 
 

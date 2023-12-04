@@ -6,24 +6,25 @@ var modeSelector = document.getElementById("mode-selector");
 var acToggleBtn = document.getElementById("ac-toggle");
 var acStatusText = document.getElementById("ac-status-text");
 var isACOn = true;
+var room_id = 101;
 
 // 禁用控件
-function disableControls() {
-    temperatureSlider.disabled = true;
-    fanSpeedSlider.disabled = true;
-    modeSelector.disabled = true;
-}
-
-// 启用控件
-function enableControls() {
-    temperatureSlider.disabled = false;
-    fanSpeedSlider.disabled = false;
-    modeSelector.disabled = false;
-}
-
-// 初始化禁用控件
-// disableControls();
-enableControls()
+// function disableControls() {
+//     temperatureSlider.disabled = true;
+//     fanSpeedSlider.disabled = true;
+//     modeSelector.disabled = true;
+// }
+//
+// // 启用控件
+// function enableControls() {
+//     temperatureSlider.disabled = false;
+//     fanSpeedSlider.disabled = false;
+//     modeSelector.disabled = false;
+// }
+//
+// // 初始化禁用控件
+// // disableControls();
+// enableControls()
 
 temperatureSlider.addEventListener("input", function() {
     if (isACOn) {
@@ -86,30 +87,6 @@ function toggleAC() {
     });
 }
 
-// function toggleAC() {
-//     isACOn = !isACOn;
-//     if (isACOn) {
-//         acToggleBtn.textContent = "关闭";
-//         acStatusText.textContent = "空调已开启";
-//         enableControls();
-//     } else {
-//         acToggleBtn.textContent = "开启";
-//         acStatusText.textContent = "空调已关闭";
-//         disableControls();
-//     }
-// }
-
-// function submitForm() {
-//     if (isACOn) {
-//         alert('空调状态已设置!');
-//         return true;
-//     } else {
-//         alert('请先开启空调!');
-//         return false;
-//     }
-// }
-
-
 
  //退房函数
  document.getElementById('checkout').addEventListener('click', function(event) {
@@ -139,7 +116,7 @@ function handleAcAction_roomState(event) {
     var form = event.target; // 获取触发事件的表单
     var url = form.action;   // 表单的action属性指向后端的URL
     var formData = new FormData(form); // 创建一个FormData对象，包含表单数据
-
+    console.log("handleAcAction被调用"); // 输出调试信息
     fetch(url, {
         method: 'POST',
         body: formData,
@@ -178,75 +155,6 @@ document.getElementById('ac_close_panel').addEventListener('submit', handleAcAct
 
 
 
-
-
-
-
-
-
-function updateAcSettings(event) {
-    event.preventDefault();  // 阻止表单的默认提交行为
-
-    var form = event.target;
-    var formData = new FormData(form);
-    var actionUrl = form.action; // 获取表单的action URL
-
-    fetch(actionUrl, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': getCsrfToken2() // 获取CSRF Token
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        // 这里可以根据返回的数据进行一些操作，比如更新页面元素或显示消息
-        console.log('Temperature and fan speed updated:', data);
-    })
-    .catch(error => console.error('Error:', error));
-}
-
-function getCsrfToken2() {
-    var name = 'csrftoken';
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-// 将事件监听器绑定到温度和风速控制表单
-document.getElementById('ac_temperature_control').addEventListener('submit', updateAcSettings);
-
-
-
-
-
-
-// 获取CSRF Token的函数
-function getCsrfToken3() {
-    var name = 'csrftoken';
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
 // 处理空调设置表单的提交
 function AcSettingsAlert(event) {
     event.preventDefault();  // 阻止表单的默认提交行为
@@ -259,7 +167,7 @@ function AcSettingsAlert(event) {
         method: 'POST',
         body: formData,
         headers: {
-            'X-CSRFToken': getCsrfToken3() // 使用CSRF Token
+            'X-CSRFToken': getCsrfToken() // 使用CSRF Token
         }
     })
     .then(response => {
@@ -289,8 +197,25 @@ document.getElementById('ac_temperature_control').addEventListener('submit',  Ac
 
 
 function updateStatus() {
+    console.log('updateStatus() 函数被调用了！'); // 添加日志
+
+    // var room_id = document.getElementById('displayRoomNumber').textContent; // 假设这个元素中存储了 room_id
+    console.log('room_id:', room_id);
+    var requestData = {
+        room_id: room_id // 将 room_id 加入请求数据中
+        // 可以添加其他需要的数据...
+    };
+    console.log('requestData:', requestData);
     // 使用fetch或其他AJAX方法发送请求
-    fetch('/change_ac_state/')
+    fetch('/change_ac_state/', {
+        method: 'POST',
+        body: JSON.stringify(requestData), // 将请求数据转换为 JSON 字符串放入请求 body 中
+        headers: {
+            'Content-Type': 'application/json', // 指定请求 body 中的数据类型为 JSON
+            'X-CSRFToken': getCsrfToken()
+            // 可以添加其他请求头...
+        }
+    })
         .then(response => response.json())
         .then(data => {
             // 假设服务器返回的数据格式是 { cur_tem: '...', cur_wind: '...', cost: '...', sum_cost: '...', ac_status: '...' }
@@ -300,7 +225,7 @@ function updateStatus() {
             document.getElementById('sum_cost').textContent = data.sum_cost;
 
             // 更新空调状态
-            document.getElementById('ac-status-text').textContent = `空调已${data.ac_status}`;
+            document.getElementById('room_state').textContent = data.ac_status;
 
             // 其他更新逻辑...
         })
@@ -308,4 +233,6 @@ function updateStatus() {
 }
 
 // 设置定时器，每30秒调用一次updateStatus函数
-setInterval(updateStatus, 30000);
+setInterval(updateStatus, 10000);
+
+

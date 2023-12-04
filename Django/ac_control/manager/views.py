@@ -351,10 +351,29 @@ class Scheduler(View):  # 在views里直接创建
         self.state = 4
         return self.state
 
-    def back_temp(self, room):
+    def back_temp(self, room, mode):
         '''
         回温
         '''
+        if room.state == 4:
+            if mode == 1:
+                room.current_temp -= 0.008
+                if abs(room.target_temp - room.current_temp) > 1:
+                    if self.SQ.serving_num < 3:  # 服务队列没满
+                        self.SQ.insert(room)
+                    else:
+                        self.WQ.insert(room)
+                timer = threading.Timer(1, self.back_temp, [room, 1])  # 每1秒执行一次函数
+                timer.start()
+            else:
+                room.current_temp += 0.008
+                if abs(room.target_temp - room.current_temp) > 1 and room.current_temp > room.target_temp:
+                    if self.SQ.serving_num < 3:  # 服务队列没满
+                        self.SQ.insert(room)
+                    else:
+                        self.WQ.insert(room)
+                timer = threading.Timer(1, self.back_temp, [room, 2])  # 每1秒执行一次函数
+                timer.start()
 
     def scheduling(self):
         # 资源足够的情况
@@ -454,7 +473,7 @@ class Scheduler(View):  # 在views里直接创建
         #                 self.back_temp(room, 1)
         #             else:
         #                 self.back_temp(room, 2)
-        timer = threading.Timer(1, self.check_target_arrive)  # 每5秒执行一次check函数
+        timer = threading.Timer(1, self.check_target_arrive)  # 每1秒执行一次check函数
         timer.start()
 
 def login(request):

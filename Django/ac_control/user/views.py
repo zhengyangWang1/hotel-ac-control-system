@@ -14,6 +14,7 @@ import csv
 import os
 import json
 
+
 # Create your views here.
 class RoomsInfo:  # 监控器使用
     def __init__(self, rooms):
@@ -35,20 +36,31 @@ class RoomsInfo:  # 监控器使用
                 self.dic["fee"].append('%.2f' % room.fee)
                 self.dic["target_temp"].append(room.target_temp)
                 self.dic["fee_rate"].append(room.fee_rate)
+
+
 class RoomBuffer:  # 房间数据缓存
     on_flag = [None, False, False, False, False, False]
     target_temp = [0, 25, 25, 25, 25, 25]  # 不要用数组。。。。
     init_temp = [0, 32, 28, 30, 29, 35]
+
 
 # ============静态变量===========
 room_b = RoomBuffer
 speed_ch = ["", "高速", "中速", "低速"]
 state_ch = ["", "服务中", "等待", "关机", "休眠"]
 
-
 # ===========暂时直接执行，需要时通过管理员执行===========
 scheduler = Scheduler()  # 创建一个调度器
-scheduler.power_on()  # 开启调度器
+
+high = 25
+low = 18
+default = 24
+fee_h = 0.0016
+fee_l = 0.0016
+fee_m = 0.0016
+scheduler.set_para(high, low, default, fee_h, fee_l, fee_m)
+scheduler.power_on()
+scheduler.start_up()
 
 
 # ============客户===========
@@ -91,7 +103,7 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
 
     room_id = request.POST.get('room_id')
     user_id = request.POST.get('user_id')
-    room = scheduler.request_on(room_id, user_id, 24)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
+    room = scheduler.request_on(room_id, user_id, default)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
     if room.state == 1:
         # 打开空调
         room_state = '开启'
@@ -110,9 +122,17 @@ def change_ac_state(request):
     # 从 JSON 数据中获取 room_id
     room_id = json_data.get('room_id')
 
-    print('从前端获得的room_id:', room_id)
     # room = Room.objects.get(room_id=room_id)
-    room = Room.objects.filter(room_id=room_id).order_by('-request_time')[0]
+    # room = Room.objects.filter(room_id=room_id).order_by('-request_time')[0]  # 因为是从数据库找的room，所以费用不更新
+
+    # 从rooms中找
+    rooms = scheduler.rooms
+    for r in rooms:
+        print('rooms中得到的room_id:', r.room_id, '，数据类型：', type(r.room_id))  # str类型
+        print('从前端获得的room_id:', room_id, '，数据类型：', type(room_id))  # int类型
+        if int(r.room_id) == room_id:
+            print('找到room啦')
+            room = r
 
     if room.state == 1:
         new_state = '开启'
@@ -149,15 +169,16 @@ def change_temp_wind(request):
     room_id = request.POST.get('room_id')
     temp = int(request.POST.get('temperature'))  # 前端传来时为str，需要转化为int
     wind_speed = int(request.POST.get('fan_speed'))
-    print(temp)
     # 更新参数
     scheduler.change_target_temp(room_id, temp)  # 改变room的target_temp属性，写入数据库
     scheduler.change_fan_speed(room_id, wind_speed)  # 改变room的fan_speed属性，写入数据库
     return JsonResponse({'status': 'success'})
 
+
 # ============管理员===========
 def init(request):
     return render(request, 'init.html')
+
 
 def init_submit(request):
     request.encoding = 'utf-8'
@@ -176,13 +197,11 @@ def init_submit(request):
     scheduler.start_up()
     return HttpResponseRedirect('/monitor')
 
+
 def monitor(request):
     rooms = scheduler.check_room_state()
     print(rooms)
     return render(request, 'monitor.html', RoomsInfo(rooms).dic)
-
-
-
 
 
 class Bills:
@@ -208,15 +227,15 @@ class Bills:
         if records:
             current_fee = records.first().fee
             history_fee = \
-            Room.objects.filter(room_id=room_id, request_time__range=(start_time, end_time)).aggregate(Sum('fee'))[
-                'fee__sum']
+                Room.objects.filter(room_id=room_id, request_time__range=(start_time, end_time)).aggregate(Sum('fee'))[
+                    'fee__sum']
             return current_fee, history_fee
         else:
             # 防止Attribute Error
             return 0, 0
 
     @staticmethod
-    # 这个界面前面实现了在change_ac_state里，应该不用再实现
+    # 这个界面前面实现了在change_ac_state里，应该不用再实现了
     def current_status_return(request, user_id, room_id):
         '''
         交互————用户登录后的页面
@@ -251,9 +270,11 @@ class Bills:
         start_time, end_time = Bills.get_time(user_id, room_id)
         records = Room.objects.filter(room_id=room_id, request_time__range=(start_time, end_time)).order_by(
             '-request_time')
+        detail = []
         for r in records:
             dic = {}
             dic.update(
+                request_id=r.request_id,
                 request_time=r.request_time,
                 room_id=r.room_id,
                 operation=r.get_operation_display(),
@@ -261,25 +282,26 @@ class Bills:
                 target_temp=r.target_temp,
                 fan_speed=r.get_fan_speed_display(),
                 fee=r.fee)
-            detail[r.request_id] = dic
-        # detail是一个字典，以request_id作为键值，返回给前端
+            detail.appned(dic)
+
+        for d in detail:
+            print(d)
         return detail
 
     @staticmethod
-    def details(request, user_id, room_id):
-        '''
-        交互？————详单
-        '''
-        detail = Bills.get_details(user_id, room_id)
-        return render(request, 'xx.html', {'details': detail})
-
-    @staticmethod
-    def details_table(user_id, room_id):
-        '''
-        交互————打印出来的详单
-        '''
+    def print_details(user_id, room_id):
+        """
+        打印详单
+        :param room_id: 房间号
+        :param begin_date: 起始日期
+        :param end_date: endDay
+        :return:    返回详单字典列表
+        """
         rdr = Bills.get_details(user_id, room_id)
-        file_header = ["request_time",
+        import csv
+        # 文件头，一般就是数据名
+        file_header = ["request_id",
+                       "request_time",
                        "room_id",
                        "operation",
                        "current_temp",

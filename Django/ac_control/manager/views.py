@@ -48,8 +48,10 @@ class Queue(View):
 
     def update_time(self, queue_type):
         for room in self.room_list:
-            if room.state == queue_type:
-                room.time += 1
+            if queue_type == 1:
+                room.serve_time += 1
+            if queue_type == 2:
+                room.wait_time += 1
         timer = Timer(60, lambda: self.update_time(queue_type))  # 每1min执行一次函数
         timer.start()
 
@@ -86,6 +88,7 @@ class ServingQueue(Queue):
                 else:
                     room.current_temp -= 0.005
                     room.fee += 0.016
+                print(room.current_temp)
             timer = Timer(1, self.auto_update_fee, [1])
             timer.start()
         else:
@@ -97,7 +100,7 @@ class ServingQueue(Queue):
                     room.current_temp -= 0.008
                     room.fee += 0.016
                 else:
-                    room.room_id -= 0.005
+                    room.current_temp -= 0.005
                     room.fee += 0.016
             timer = Timer(1, self.auto_update_fee, [2])
             timer.start()

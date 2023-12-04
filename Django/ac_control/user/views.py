@@ -79,16 +79,28 @@ def change_ac_state(request):
     # 从 JSON 数据中获取 room_id
     room_id = json_data.get('room_id')
     print('从前端获得的room_id:', room_id)
-    target_room = None
     # room = Room.objects.get(room_id=room_id)
+    room = Room.objects.filter(room_id=room_id).order_by('-request_time')[0]
+    print(room)
+    if room.state == 1:
+        new_state = '服务'
+    elif room.state == 2:
+        new_state = '等待'
+    elif room.state == 3:
+        new_state = '关机'
+    else:
+        new_state = '休眠'
+    temp = room.current_temp
+    wind = room.fan_speed
+    cost = room.fee  # !只有一个费用
     print(scheduler.rooms)
-    for room in scheduler.rooms:
-        print('rooms中的room_id:', room.room_id)
-        if room.room_id == room_id:
-            new_state = room.state  # 获取当前房间状态
-            temp = room.current_temp
-            wind = room.fan_speed
-            cost = room.fee  # !只有一个费用
+    # for room in scheduler.rooms:
+    #     print('rooms中的room_id:', room.room_id)
+    #     if room.room_id == room_id:
+    #         new_state = room.state  # 获取当前房间状态
+    #         temp = room.current_temp
+    #         wind = room.fan_speed
+    #         cost = room.fee  # !只有一个费用
     print('得到的对应房间的room_id:', room.room_id)
     return JsonResponse({'cur_tem': temp, 'cur_wind': wind, 'cost': cost, 'sum_cost': cost, 'ac_status': new_state})
 

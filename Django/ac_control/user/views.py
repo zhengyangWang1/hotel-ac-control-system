@@ -14,6 +14,7 @@ import csv
 import os
 import json
 
+
 # Create your views here.
 class RoomsInfo:  # 监控器使用
     def __init__(self, rooms):
@@ -35,19 +36,22 @@ class RoomsInfo:  # 监控器使用
                 self.dic["fee"].append('%.2f' % room.fee)
                 self.dic["target_temp"].append(room.target_temp)
                 self.dic["fee_rate"].append(room.fee_rate)
+
+
 class RoomBuffer:  # 房间数据缓存
     on_flag = [None, False, False, False, False, False]
     target_temp = [0, 25, 25, 25, 25, 25]  # 不要用数组。。。。
     init_temp = [0, 32, 28, 30, 29, 35]
+
 
 # ============静态变量===========
 room_b = RoomBuffer
 speed_ch = ["", "高速", "中速", "低速"]
 state_ch = ["", "服务中", "等待", "关机", "休眠"]
 
-
-
+# ===========暂时直接执行，需要时通过管理员执行===========
 scheduler = Scheduler()  # 创建一个调度器
+
 high = 25
 low = 18
 default = 24
@@ -57,6 +61,7 @@ fee_m = 0.0016
 scheduler.set_para(high, low, default, fee_h, fee_l, fee_m)
 scheduler.power_on()
 scheduler.start_up()
+
 
 # ============客户===========
 def register(request):
@@ -98,7 +103,7 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
 
     room_id = request.POST.get('room_id')
     user_id = request.POST.get('user_id')
-    room = scheduler.request_on(room_id, user_id, 24)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
+    room = scheduler.request_on(room_id, user_id, default)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
     if room.state == 1:
         # 打开空调
         room_state = '开启'
@@ -116,14 +121,21 @@ def change_ac_state(request):
     json_data = json.loads(request.body)
     # 从 JSON 数据中获取 room_id
     room_id = json_data.get('room_id')
-    target_room = None
-    temp = 0
-    wind = '中风'
-    cost = 0
-    new_state = '关机'
-    room = Room.objects.filter(room_id=room_id).order_by('-request_time')[0]
+
+    # room = Room.objects.get(room_id=room_id)
+    # room = Room.objects.filter(room_id=room_id).order_by('-request_time')[0]  # 因为是从数据库找的room，所以费用不更新
+
+    # 从rooms中找
+    rooms = scheduler.rooms
+    for r in rooms:
+        print('rooms中得到的room_id:', r.room_id, '，数据类型：', type(r.room_id))  # str类型
+        print('从前端获得的room_id:', room_id, '，数据类型：', type(room_id))  # int类型
+        if int(r.room_id) == room_id:
+            print('找到room啦')
+            room = r
+
     if room.state == 1:
-        new_state = '服务'
+        new_state = '开启'
     elif room.state == 2:
         new_state = '等待'
     elif room.state == 3:
@@ -138,6 +150,7 @@ def change_ac_state(request):
         wind = '高风'
     temp = room.current_temp
     cost = room.fee  # !只有一个费用
+
     return JsonResponse({'cur_tem': temp, 'cur_wind': wind, 'cost': cost, 'sum_cost': cost, 'ac_status': new_state})
 
 
@@ -162,11 +175,10 @@ def change_temp_wind(request):
     return JsonResponse({'status': 'success'})
 
 
-
-
 # ============管理员===========
 def init(request):
     return render(request, 'init.html')
+
 
 def init_submit(request):
     request.encoding = 'utf-8'
@@ -185,13 +197,11 @@ def init_submit(request):
     scheduler.start_up()
     return HttpResponseRedirect('/monitor')
 
+
 def monitor(request):
     rooms = scheduler.check_room_state()
     print(rooms)
     return render(request, 'monitor.html', RoomsInfo(rooms).dic)
-
-
-
 
 
 class Bills:
@@ -217,8 +227,8 @@ class Bills:
         if records:
             current_fee = records.first().fee
             history_fee = \
-            Room.objects.filter(room_id=room_id, request_time__range=(start_time, end_time)).aggregate(Sum('fee'))[
-                'fee__sum']
+                Room.objects.filter(room_id=room_id, request_time__range=(start_time, end_time)).aggregate(Sum('fee'))[
+                    'fee__sum']
             return current_fee, history_fee
         else:
             # 防止Attribute Error

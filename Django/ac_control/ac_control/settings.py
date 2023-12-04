@@ -84,9 +84,9 @@ WSGI_APPLICATION = "ac_control.wsgi.application"
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "hotel",  # 数据库名字
+        "NAME": "django",  # 数据库名字
         "USER": 'root',  # 用户名
-        'PASSWORD': '123456',
+        'PASSWORD': '030530',
 
 
         'HOST': '127.0.0.1',  # 主机

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponseRedirect
 from user import models
 import datetime
 from manager.views import Scheduler
@@ -15,10 +15,43 @@ import os
 import json
 
 # Create your views here.
+class RoomsInfo:  # 监控器使用
+    def __init__(self, rooms):
+        self.dic = {
+            "room_id": [0],
+            "state": [""],
+            "fan_speed": [""],
+            "current_temp": [0],
+            "fee": [0],
+            "target_temp": [0],
+            "fee_rate": [0]
+        }
+        if rooms:
+            for room in rooms:  # 从1号房开始
+                self.dic["room_id"].append(room.room_id)
+                self.dic["state"].append(state_ch[room.state])
+                self.dic["fan_speed"].append(speed_ch[room.fan_speed])
+                self.dic["current_temp"].append('%.2f' % room.current_temp)
+                self.dic["fee"].append('%.2f' % room.fee)
+                self.dic["target_temp"].append(room.target_temp)
+                self.dic["fee_rate"].append(room.fee_rate)
+class RoomBuffer:  # 房间数据缓存
+    on_flag = [None, False, False, False, False, False]
+    target_temp = [0, 25, 25, 25, 25, 25]  # 不要用数组。。。。
+    init_temp = [0, 32, 28, 30, 29, 35]
 
+# ============静态变量===========
+room_b = RoomBuffer
+speed_ch = ["", "高速", "中速", "低速"]
+state_ch = ["", "服务中", "等待", "关机", "休眠"]
+
+
+# ===========暂时直接执行，需要时通过管理员执行===========
 scheduler = Scheduler()  # 创建一个调度器
+scheduler.power_on()  # 开启调度器
 
 
+# ============客户===========
 def register(request):
     if request.method == 'POST':
         room_id = request.POST.get('roomNumber')
@@ -57,9 +90,8 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
     """获取request中的用户信息和空调数据"""
 
     room_id = request.POST.get('room_id')
-    print(room_id)
-    room = scheduler.request_on(room_id, 26)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
-
+    user_id = request.POST.get('user_id')
+    room = scheduler.request_on(room_id, user_id, 24)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
     if room.state == 1:
         # 打开空调
         room_state = '开启'
@@ -75,33 +107,30 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
 def change_ac_state(request):
     # room_id = request.POST.get('room_id')
     json_data = json.loads(request.body)
-
     # 从 JSON 数据中获取 room_id
     room_id = json_data.get('room_id')
+
     print('从前端获得的room_id:', room_id)
     # room = Room.objects.get(room_id=room_id)
     room = Room.objects.filter(room_id=room_id).order_by('-request_time')[0]
-    print(room)
+
     if room.state == 1:
-        new_state = '服务'
+        new_state = '开启'
     elif room.state == 2:
         new_state = '等待'
     elif room.state == 3:
         new_state = '关机'
     else:
         new_state = '休眠'
+    if room.fan_speed == 1:
+        wind = '低风'
+    elif room.fan_speed == 2:
+        wind = '中风'
+    else:
+        wind = '高风'
     temp = room.current_temp
-    wind = room.fan_speed
     cost = room.fee  # !只有一个费用
-    print(scheduler.rooms)
-    # for room in scheduler.rooms:
-    #     print('rooms中的room_id:', room.room_id)
-    #     if room.room_id == room_id:
-    #         new_state = room.state  # 获取当前房间状态
-    #         temp = room.current_temp
-    #         wind = room.fan_speed
-    #         cost = room.fee  # !只有一个费用
-    print('得到的对应房间的room_id:', room.room_id)
+
     return JsonResponse({'cur_tem': temp, 'cur_wind': wind, 'cost': cost, 'sum_cost': cost, 'ac_status': new_state})
 
 
@@ -111,7 +140,8 @@ def close_ac(request):
     room_id = request.POST.get('room_id')
     room = scheduler.request_off(room_id)
     room_state = '关机'
-    return JsonResponse({'room_state': room_state})  # 返回JSON响应
+    context = {'room_state': room_state}
+    return JsonResponse(context)
 
 
 # 用户设定好温度和风速后点击确定
@@ -119,13 +149,40 @@ def change_temp_wind(request):
     room_id = request.POST.get('room_id')
     temp = int(request.POST.get('temperature'))  # 前端传来时为str，需要转化为int
     wind_speed = int(request.POST.get('fan_speed'))
-    print(room_id)
     print(temp)
-    print(scheduler.rooms)
     # 更新参数
     scheduler.change_target_temp(room_id, temp)  # 改变room的target_temp属性，写入数据库
     scheduler.change_fan_speed(room_id, wind_speed)  # 改变room的fan_speed属性，写入数据库
     return JsonResponse({'status': 'success'})
+
+# ============管理员===========
+def init(request):
+    return render(request, 'init.html')
+
+def init_submit(request):
+    request.encoding = 'utf-8'
+    high = int(request.GET['high'])
+    low = int(request.GET['low'])
+    default = int(request.GET['default'])
+    fee_h = float(request.GET['fee_h'])
+    fee_m = float(request.GET['fee_m'])
+    fee_l = float(request.GET['fee_l'])
+    for i in range(1, 6):
+        room_b.init_temp[i] = int(request.GET['r' + str(i)])
+
+    print(room_b.init_temp)
+    scheduler.set_para(high, low, default, fee_h, fee_l, fee_m)
+    scheduler.power_on()
+    scheduler.start_up()
+    return HttpResponseRedirect('/monitor')
+
+def monitor(request):
+    rooms = scheduler.check_room_state()
+    print(rooms)
+    return render(request, 'monitor.html', RoomsInfo(rooms).dic)
+
+
+
 
 
 class Bills:
@@ -146,6 +203,7 @@ class Bills:
         而非每次开关机
         '''
         # -表示降序排列，找到最新的房间记录
+        # 这里有点问题，我们的数据库应该是只有一个fee，会累加更新，所以最新一条即为空调累计费用，不存在段费用 ？？？？？？
         records = Room.objects.filter(room_id=room_id).order_by('-request_time')
         if records:
             current_fee = records.first().fee
@@ -158,6 +216,7 @@ class Bills:
             return 0, 0
 
     @staticmethod
+    # 这个界面前面实现了在change_ac_state里，应该不用再实现
     def current_status_return(request, user_id, room_id):
         '''
         交互————用户登录后的页面
@@ -169,7 +228,7 @@ class Bills:
             status['current_speed'] = current_record.fan_speed
             status['target_temp'] = current_record.target_temp
             start_time, end_time = Bills.get_time(user_id, room_id)
-            status['current_fee'], status['history_fee'] = Bills.Bills.cal_fee(start_time, end_time, room_id)
+            status['current_fee'], status['history_fee'] = Bills.cal_fee(start_time, end_time, room_id)
         else:
             # 不知道有没有必要写
             status = {}

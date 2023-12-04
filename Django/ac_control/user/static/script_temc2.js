@@ -232,7 +232,7 @@ function updateStatus() {
         .catch(error => console.error('Error:', error));
 }
 
-// 设置定时器，每30秒调用一次updateStatus函数
+// 设置定时器，每秒调用一次updateStatus函数
 setInterval(updateStatus, 1000);
 
 

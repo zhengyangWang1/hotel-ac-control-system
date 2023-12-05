@@ -390,21 +390,22 @@ class Reports:
         current_record = Room.objects.filter(room_id=room_id).order_by('-request_time').first()
         if current_record:
             status = {}
-            status['current_temp'] = current_record.current_temp
-            status['current_speed'] = current_record.fan_speed
-            status['target_temp'] = current_record.target_temp
-            status['fee'] = current_record.fee
+            status['cur_tem'] = current_record.current_temp
+            status['air_condition']=current_record.state
+            status['cur_wind'] = current_record.fan_speed
+            status['target_tem'] = current_record.target_temp
+
         else:
             # 不知道有没有必要写
             status = {}
-            status['current_temp'] = 26
-            status['current_speed'] = 0
-            status['target_temp'] = 'not set'
-            status['fee'] = 0
+            status['cur_tem'] = 26
+            status['air_condition'] = 0
+            status['cur_wind']= 'not set'
+            status['target_tem'] = 0
         return current_record
 
     @staticmethod
-    def get_current_report(request, room_id):
+    def get_current_report(request):
         '''
         交互————管理员或前台监控
         缺少消费总金额计算

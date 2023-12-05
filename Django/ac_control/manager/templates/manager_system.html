@@ -26,7 +26,7 @@
 
         <nav>
             <ul>
-                <li><a href="#">用户名</a></li>      
+                <li><a href="#">{{manager_name}}</a></li>      
             </ul>
         </nav>
 
@@ -60,45 +60,61 @@
                 <thead>
                     <tr>
                         <th>房间号</th>
-                        <th>顾客名</th>
                         <th>入住时间</th>
-                        
-                        <th>消费金额</th>
+                        <th>离开时间</th>
+                        <th>空调总费用</th>
                         <th>操作</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>101</td>
-                        <td>张三</td>
-                        <td>2023-11-20</td>
-                       
-                        <td>¥800</td>
+                        <td>{{checkin_time101}}</td>
+                        <td>{{checkout_time101}}</td>
+                        <td>¥{{sum_cost101}}</td>
                         <td>
-                            <button onclick="viewDetails('101')" class="button-primary">查看消费明细</button>
-                            <button onclick="checkout('101')"  class="button-danger">退房</button>
+                            <button class="button-primary">打印详单</button>
+                            <button class="button-danger">退房</button>
                         </td>
                     </tr>
                     <tr>
                         <td>102</td>
-                        <td>李四</td>
-                        <td>2023-11-18</td>
-                        
-                        <td>¥500</td>
+                        <td>{{checkin_time102}}</td>
+                        <td>{{checkout_time102}}</td>
+                        <td>¥{{sum_cost102}}</td>
                         <td>
-                            <button onclick="viewDetails('102')">查看消费明细</button>
-                            <button onclick="checkout('102')">退房</button>
+                            <button class="button-primary">打印详单</button>
+                            <button class="button-danger">退房</button>
                         </td>
                     </tr>
                     <tr>
                         <td>103</td>
-                        <td>王五</td>
-                        <td>2023-11-19</td>
-                        
-                        <td>¥1200</td>
+                        <td>{{checkin_time103}}</td>
+                        <td>{{checkout_time103}}</td>
+                        <td>¥{{sum_cost103}}</td>
                         <td>
-                            <button onclick="viewDetails('103')">查看消费明细</button>
-                            <button onclick="checkout('103')">退房</button>
+                            <button class="button-primary">打印详单</button>
+                            <button class="button-danger">退房</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>104</td>
+                        <td>{{checkin_time104}}</td>
+                        <td>{{checkout_time104}}</td>
+                        <td>¥{{sum_cost104}}</td>
+                        <td>
+                            <button class="button-primary">打印详单</button>
+                            <button class="button-danger">退房</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>105</td>
+                        <td>{{checkin_time105}}</td>
+                        <td>{{checkout_time105}}</td>
+                        <td>¥{{sum_cost105}}</td>
+                        <td>
+                            <button  class="button-primary">打印详单</button>
+                            <button  class="button-danger">退房</button>
                         </td>
                     </tr>
                 </tbody>

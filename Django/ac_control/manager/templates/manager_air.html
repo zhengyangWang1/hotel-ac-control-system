@@ -26,7 +26,7 @@
 
         <nav>
             <ul>
-                <li><a href="#">用户名</a></li>      
+                <li><a href="#">{{manager_name}}</a></li>      
             </ul>
         </nav>
 
@@ -54,26 +54,22 @@
                 <thead>
                     <tr>
                         <th>房间号</th>
-                        <th>顾客名</th>
                         <th>空调状态</th>
                         <th>当前温度</th>
                         <th>目标温度</th>  
                         <th>当前风速</th>
                         <th>空调模式</th>
-                        <th>累计费用</th>
                         <th>操作</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>101</td>
-                        <td>张三</td>
-                        <td>开</td>
-                        <td>20</td>
-                        <td>20</td>
-                        <td>中风</td>
-                        <td>制冷</td>
-                        <td>￥20</td>
+                        <td>{{air_condition101}}</td>
+                        <td>{{cur_tem101}}</td>
+                        <td>{{target_tem101}}</td>
+                        <td>{{cur_wind101}}</td>
+                        <td>制热</td>
                         <td>
                             <button  class="button-primary">维修</button>
                             <!-- <button onclick="checkout('101')"  class="button-danger">退房</button> -->
@@ -81,13 +77,11 @@
                     </tr>
                     <tr>
                         <td>102</td>
-                        <td>李四</td>
-                        <td>开</td>
-                        <td>20</td>
-                        <td>20</td>
-                        <td>中风</td>
-                        <td>制冷</td>
-                        <td>￥20</td>
+                        <td>{{air_condition102}}</td>
+                        <td>{{cur_tem102}}</td>
+                        <td>{{target_tem102}}</td>
+                        <td>{{cur_wind102}}</td>
+                        <td>制热</td>
                         <td>
                             <button class="button-primary">维修</button>
                             <!-- <button onclick="checkout('102')">退房</button> -->
@@ -95,13 +89,35 @@
                     </tr>
                     <tr>
                         <td>103</td>
-                        <td>王五</td>
-                        <td>开</td>
-                        <td>20</td>
-                        <td>20</td>
-                        <td>中风</td>
-                        <td>制冷</td>
-                        <td>￥20</td>
+                        <td>{{air_condition103}}</td>
+                        <td>{{cur_tem103}}</td>
+                        <td>{{target_tem103}}</td>
+                        <td>{{cur_wind103}}</td>
+                        <td>制热</td>
+                        <td>
+                            <button class="button-primary">维修</button>
+                            <!-- <button onclick="checkout('103')">退房</button> -->
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>104</td>
+                        <td>{{air_condition104}}</td>
+                        <td>{{cur_tem104}}</td>
+                        <td>{{target_tem104}}</td>
+                        <td>{{cur_wind104}}</td>
+                        <td>制热</td>
+                        <td>
+                            <button class="button-primary">维修</button>
+                            <!-- <button onclick="checkout('103')">退房</button> -->
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>105</td>
+                        <td>{{air_condition105}}</td>
+                        <td>{{cur_tem105}}</td>
+                        <td>{{target_tem105}}</td>
+                        <td>{{cur_wind105}}</td>
+                        <td>制热</td>
                         <td>
                             <button class="button-primary">维修</button>
                             <!-- <button onclick="checkout('103')">退房</button> -->

@@ -100,6 +100,15 @@ class Room(models.Model):
         db_table = 'Room'
 
 
+    def __init__(self, *args, **kwargs):
+        super(Room, self).__init__(*args, **kwargs)
+        # 记录原始属性值
+        self._original_target_temp = self.target_temp
+
+    def target_temp_has_changed(self):
+        # 检查属性是否发生变化
+        return hasattr(self, '_original_target_temp') and self.target_temp != self._original_target_temp
+
 
 
 

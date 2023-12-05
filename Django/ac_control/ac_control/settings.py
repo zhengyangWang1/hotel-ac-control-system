@@ -86,7 +86,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "django",  # 数据库名字
         "USER": 'root',  # 用户名
-        'PASSWORD': '030530',
+        'PASSWORD': '123456',
 
 
         'HOST': '127.0.0.1',  # 主机
@@ -118,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 

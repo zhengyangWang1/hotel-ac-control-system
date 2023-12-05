@@ -106,7 +106,7 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
 
     room_id = request.POST.get('room_id')
     # room_id = int(room_id)
-    print(type(room_id))
+    # print(type(room_id))
     user_id = request.POST.get('user_id')
     if room_id == '101':
         init_temp = 10
@@ -126,7 +126,7 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
         # 等待资源中
         room_state = '等待'
 
-    context = {'room_state': room_state}
+    context = {'room_state': room_state, 'room': room_id}
     return JsonResponse(context)
 
 
@@ -143,10 +143,10 @@ def change_ac_state(request):
     # 从rooms中找
     rooms = scheduler.rooms
     for r in rooms:
-        # print('rooms中得到的room_id:', r.room_id, '，数据类型：', type(r.room_id))  # str类型
-        # print('从前端获得的room_id:', room_id, '，数据类型：', type(room_id))  # int类型
-        if int(r.room_id) == room_id:
-            # print('找到room啦')
+        print('rooms中得到的room_id:', r.room_id, '，数据类型：', type(r.room_id))  # str类型
+        print('从前端获得的room_id:', room_id, '，数据类型：', type(room_id))  # str类型
+        if r.room_id == room_id:
+            print('找到room啦')
             room = r
 
     if room.state == 1:

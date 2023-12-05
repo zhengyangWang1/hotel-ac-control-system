@@ -417,4 +417,5 @@ class Reports:
         # 打印所有房间号
         for room_id in all_room_ids:
             home_status[room_id] = Reports.current_status(room_id)
-        return render(request, '', {'status': home_status})
+        print({'home_status': home_status})
+        return render(request, 'manager_air.html', {'status': home_status})

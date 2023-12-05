@@ -54,7 +54,8 @@ scheduler = Scheduler()  # 创建一个调度器
 
 high = 25
 low = 18
-default = 24
+default = 10
+fan_speed = 2
 fee_h = 0.0016
 fee_l = 0.0016
 fee_m = 0.0016
@@ -102,8 +103,20 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
     """获取request中的用户信息和空调数据"""
 
     room_id = request.POST.get('room_id')
+    # room_id = int(room_id)
+    print(type(room_id))
     user_id = request.POST.get('user_id')
-    room = scheduler.request_on(room_id, user_id, default)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
+    if room_id == '101':
+        init_temp = 10
+    elif room_id == '102':
+        init_temp = 15
+    elif room_id == '103':
+        init_temp = 18
+    elif room_id == '104':
+        init_temp = 12
+    else:
+        init_temp = 14
+    room = scheduler.request_on(room_id, user_id, init_temp)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
     if room.state == 1:
         # 打开空调
         room_state = '开启'
@@ -128,10 +141,10 @@ def change_ac_state(request):
     # 从rooms中找
     rooms = scheduler.rooms
     for r in rooms:
-        print('rooms中得到的room_id:', r.room_id, '，数据类型：', type(r.room_id))  # str类型
-        print('从前端获得的room_id:', room_id, '，数据类型：', type(room_id))  # int类型
+        # print('rooms中得到的room_id:', r.room_id, '，数据类型：', type(r.room_id))  # str类型
+        # print('从前端获得的room_id:', room_id, '，数据类型：', type(room_id))  # int类型
         if int(r.room_id) == room_id:
-            print('找到room啦')
+            # print('找到room啦')
             room = r
 
     if room.state == 1:
@@ -148,6 +161,7 @@ def change_ac_state(request):
         wind = '中风'
     else:
         wind = '高风'
+    # print(room.fan_speed)  # 0 !
     temp = room.current_temp
     cost = room.fee  # !只有一个费用
 
@@ -169,6 +183,7 @@ def change_temp_wind(request):
     room_id = request.POST.get('room_id')
     temp = int(request.POST.get('temperature'))  # 前端传来时为str，需要转化为int
     wind_speed = int(request.POST.get('fan_speed'))
+    print(wind_speed, type(wind_speed))
     # 更新参数
     scheduler.change_target_temp(room_id, temp)  # 改变room的target_temp属性，写入数据库
     scheduler.change_fan_speed(room_id, wind_speed)  # 改变room的fan_speed属性，写入数据库
@@ -390,22 +405,21 @@ class Reports:
         current_record = Room.objects.filter(room_id=room_id).order_by('-request_time').first()
         if current_record:
             status = {}
-            status['cur_tem'] = current_record.current_temp
-            status['air_condition']=current_record.state
-            status['cur_wind'] = current_record.fan_speed
-            status['target_tem'] = current_record.target_temp
-
+            status['current_temp'] = current_record.current_temp
+            status['current_speed'] = current_record.fan_speed
+            status['target_temp'] = current_record.target_temp
+            status['fee'] = current_record.fee
         else:
             # 不知道有没有必要写
             status = {}
-            status['cur_tem'] = 26
-            status['air_condition'] = 0
-            status['cur_wind']= 'not set'
-            status['target_tem'] = 0
+            status['current_temp'] = 26
+            status['current_speed'] = 0
+            status['target_temp'] = 'not set'
+            status['fee'] = 0
         return current_record
 
     @staticmethod
-    def get_current_report(request):
+    def get_current_report(request, room_id):
         '''
         交互————管理员或前台监控
         缺少消费总金额计算

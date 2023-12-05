@@ -64,13 +64,13 @@ class ServingQueue(Queue):
     def insert(self, room, queue_type=1):
         super().insert(room, queue_type=queue_type)
         self.serving_num += 1
-        room.sever_begin_time = django.utils.timezone.now
+        room.sever_begin_time = django.utils.timezone.now()
         return True
 
     def delete(self, room):
         super().delete(room)
         self.serving_num -= 1
-        room.sever_over_time = django.utils.timezone.now
+        room.sever_over_time = django.utils.timezone.now()
         return True
 
     def update_serve_time(self):

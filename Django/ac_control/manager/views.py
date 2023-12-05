@@ -14,6 +14,7 @@ from django.views import View
 from threading import Timer
 from user.models import Room
 
+
 # import numpy as np
 
 # Create your views here.
@@ -55,9 +56,11 @@ class Queue(View):
         timer = Timer(60, lambda: self.update_time(queue_type))  # 每1min执行一次函数
         timer.start()
 
+
 class ServingQueue(Queue):
     serving_num = 0
     queue_type = 1  # 1为服务状态
+
     def insert(self, room, queue_type=1):
         super().insert(room, queue_type=queue_type)
         self.serving_num += 1
@@ -76,18 +79,19 @@ class ServingQueue(Queue):
     def auto_update_fee(self, mode):
         '''
         自动计费功能
+        每秒
         '''
         if mode == 1:
             for room in self.room_list:
                 if room.fan_speed == 3:
-                    room.current_temp -= 0.016
-                    room.fee += 0.016
+                    room.current_temp += 1
+                    room.fee += 1
                 elif room.fan_speed == 2:
-                    room.current_temp -= 0.008
-                    room.fee += 0.016
+                    room.current_temp += 1
+                    room.fee += 0.5
                 else:
-                    room.current_temp -= 0.005
-                    room.fee += 0.016
+                    room.current_temp += 1
+                    room.fee = room.fee + (1 / 3)
                 print(room.current_temp)
             timer = Timer(1, self.auto_update_fee, [1])
             timer.start()
@@ -97,13 +101,14 @@ class ServingQueue(Queue):
                     room.current_temp -= 0.016
                     room.fee += 0.016
                 elif room.fan_speed == 2:
-                    room.current_temp -= 0.008
-                    room.fee += 0.016
+                    room.current_temp -= 0.016
+                    room.fee += 0.008
                 else:
-                    room.current_temp -= 0.005
-                    room.fee += 0.016
+                    room.current_temp -= 0.016
+                    room.fee += 0.005
             timer = Timer(1, self.auto_update_fee, [2])
             timer.start()
+
 
 class WaitingQueue(Queue):
     waiting_num = 0
@@ -150,7 +155,6 @@ class Scheduler(View):  # 在views里直接创建
 
         self.state = 2
 
-
     def set_para(self, high_temp, low_temp, default, h_rate_fee, m_rate_fee, l_rate_fee):
         self.high_temp = high_temp
         self.low_temp = low_temp
@@ -161,7 +165,7 @@ class Scheduler(View):  # 在views里直接创建
         return True
 
     # 用户申请资源
-    def request_on(self, room_id, user_id, current_temp):  # 用户开机时调用
+    def request_on(self, room_id, user_id, init_temp):  # 用户开机时调用
         '''
         一个请求到来，第一次开机分配房间对象然后处理，否则直接处理
         调用调度算法
@@ -172,7 +176,6 @@ class Scheduler(View):  # 在views里直接创建
         flag = 1
         for room in self.rooms:
             if room.room_id == room_id:  # 不是第一次开机，直接处理
-                room.current_temp = current_temp
                 room.user_id = user_id
                 flag = 0
                 if self.SQ.serving_num < 3:  # 服务队列未满
@@ -195,7 +198,8 @@ class Scheduler(View):  # 在views里直接创建
                 return False  # 返回
 
             temp_room.room_id = room_id
-            temp_room.current_temp = current_temp
+            temp_room.init_temp = init_temp  # 11
+            temp_room.current_temp = init_temp  # 11
             temp_room.user_id = user_id
             self.rooms.append(temp_room)
             if self.SQ.serving_num < 3:  # 服务队列未满
@@ -245,7 +249,7 @@ class Scheduler(View):  # 在views里直接创建
                     i += 1
                 return room
 
-   # 用户调温
+    # 用户调温
     def change_target_temp(self, room_id, target_temp):
         if target_temp < 18:
             target_temp = 18
@@ -270,7 +274,7 @@ class Scheduler(View):  # 在views里直接创建
 
                 return room
 
-  # 用户调整风速
+    # 用户调整风速
     def change_fan_speed(self, room_id, fan_speed):
         """
         处理调风请求
@@ -279,7 +283,7 @@ class Scheduler(View):  # 在views里直接创建
         :return:
         """
         if fan_speed == 1:
-            fee_rate = self.l_rate_fee # 低风速时的费率
+            fee_rate = self.l_rate_fee  # 低风速时的费率
         elif fan_speed == 2:
             fee_rate = self.m_rate_fee  # 中风速时的费率
         elif fan_speed == 3:
@@ -302,7 +306,7 @@ class Scheduler(View):  # 在views里直接创建
 
                 return room
 
-  # 用户开关机更新房间状态
+    # 用户开关机更新房间状态
     def update_room_state(self, room_id):
         '''
         检查房间是否开机
@@ -329,10 +333,10 @@ class Scheduler(View):  # 在views里直接创建
         Room.objects.all().delete()
         self.state = 3
         #  只要服务队列有房间就计费和计温,制热mode=1,制冷mode=2,
-        if self.default_target_temp == 22:
-            self.SQ.auto_update_fee(1)
-        else:
-            self.SQ.auto_update_fee(2)
+        # if self.default_target_temp == 22:
+        self.SQ.auto_update_fee(1)  # 制热
+        # else:
+        #     self.SQ.auto_update_fee(2)  # 制冷
 
         # 开启调度函数
         self.scheduling()
@@ -386,6 +390,9 @@ class Scheduler(View):  # 在views里直接创建
                     self.SQ.insert(request_room)
                     request_room.wait_time = 0  # 分配等待服务时长
 
+        timer = threading.Timer(10, self.scheduling)  # 每2min执行一次调度函数
+        timer.start()
+
     # 优先级调度
     def priority_scheduling(self, rooms, request_room):
         '''
@@ -398,7 +405,7 @@ class Scheduler(View):  # 在views里直接创建
         sorted_rooms = sorted(min_fan_speed_rooms, key=lambda x: x.serve_time, reverse=True)
         self.SQ.delete(sorted_rooms[0])
         self.WQ.insert(sorted_rooms[0])
-        sorted_rooms[0].wait_time = 0     # 等待与服务时间的分配与用处  ？？？？？?
+        sorted_rooms[0].wait_time = 0  # 等待与服务时间的分配与用处  ？？？？？?
         self.SQ.insert(request_room)
         request_room.sever_time = 0
 
@@ -438,12 +445,14 @@ class Scheduler(View):  # 在views里直接创建
     def check_target_arrive(self):  # 检查达到目标温度与否
         if len(self.SQ.room_list) != 0:
             for room in self.SQ.room_list:
-                if abs(room.current_temp - room.target_temp) < 0.1 or room.current_temp < room.target_temp:
+                if abs(room.current_temp - room.target_temp) < 0.1 or room.current_temp > room.target_temp:
+                    print(room.current_temp)
+                    print(room.target_temp)
                     room.state = 4
                     self.SQ.delete(room)
                     room.sever_over_time = timezone.now()
                     # 后面要启动回温 未实现
-                    return True
+
         # 不懂下面这段什么意义
         # if self.WQ.waiting_num != 0:
         #     for room in self.WQ.room_list:
@@ -457,7 +466,6 @@ class Scheduler(View):  # 在views里直接创建
         timer = threading.Timer(1, self.check_target_arrive)  # 每5秒执行一次check函数
         timer.start()
 
+
 def login(request):
     return render(request, 'manager_login.html')
-
-

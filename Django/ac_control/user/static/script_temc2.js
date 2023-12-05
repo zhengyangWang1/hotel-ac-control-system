@@ -58,36 +58,6 @@ modeSelector.addEventListener("change", function() {
 modeSelector.setAttribute('data-prev', modeSelector.value);
 
 
-function toggleAC() {
-    var room_id = document.querySelector('input[name="room_id"]').value;
-    var newState = isACOn ? 'off' : 'on'; // 根据当前状态决定新状态
-
-    // 发送AJAX请求
-    $.ajax({
-        type: "POST",
-        url: newState === 'on' ? '/open_ac' : '/close_ac', // 根据状态选择URL
-        data: { room_id: room_id },
-        success: function(response) {
-            // 根据响应更新状态
-            isACOn = newState === 'on';
-            acToggleBtn.textContent = isACOn ? "关闭" : "开启";
-            acStatusText.textContent = isACOn ? "空调已开启" : "空调已关闭";
-
-            // 根据空调状态启用或禁用控件
-            if (isACOn) {
-                enableControls();
-            } else {
-                disableControls();
-            }
-        },
-        error: function(error) {
-            console.error("Error:", error);
-            alert('无法更改空调状态！');
-        }
-    });
-}
-
-
  //退房函数
  document.getElementById('checkout').addEventListener('click', function(event) {
     event.preventDefault(); // 阻止链接默认行为
@@ -128,6 +98,7 @@ function handleAcAction_roomState(event) {
     .then(data => {
         // 假设后端返回的数据包含room_state字段
         document.getElementById('room_state').textContent = data.room_state;
+        room_id = data.room
     })
     .catch(error => console.error('Error:', error));
 }

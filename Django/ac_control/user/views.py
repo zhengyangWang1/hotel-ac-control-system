@@ -13,7 +13,9 @@ from datetime import timedelta
 import csv
 import os
 import json
+from django.http import HttpResponse
 
+report_saving_path = 'D:/report'
 
 # Create your views here.
 class RoomsInfo:  # 监控器使用
@@ -230,7 +232,7 @@ class Bills:
             return None, None
 
     @staticmethod
-    def cal_fee(start_time, end_time, room_id):
+    def cal_fee(room_id):
         '''
         找到当前费用和累计费用
         当前费用的理解是：从每次更新详单记录的时刻开始到现在，计算当前费用
@@ -242,7 +244,7 @@ class Bills:
         if records:
             current_fee = records.first().fee
             history_fee = \
-                Room.objects.filter(room_id=room_id, request_time__range=(start_time, end_time)).aggregate(Sum('fee'))[
+                Room.objects.filter(room_id=room_id).aggregate(Sum('fee'))[
                     'fee__sum']
             return current_fee, history_fee
         else:
@@ -280,31 +282,30 @@ class Bills:
         return total_fee
 
     @staticmethod
-    def get_details(user_id, room_id):
+    def get_details(room_id):
         detail = {}
-        start_time, end_time = Bills.get_time(user_id, room_id)
-        records = Room.objects.filter(room_id=room_id, request_time__range=(start_time, end_time)).order_by(
+        records = Room.objects.filter(room_id=room_id).order_by(
             '-request_time')
         detail = []
         for r in records:
             dic = {}
             dic.update(
-                request_id=r.request_id,
-                request_time=r.request_time,
                 room_id=r.room_id,
-                operation=r.get_operation_display(),
-                current_temp=r.current_temp,
-                target_temp=r.target_temp,
+                request_time=r.request_time,
+                server_begin_time=r.sever_begin_time,
+                server_over_time=r.sever_over_time,
+                serve_time=r.serve_time,
                 fan_speed=r.get_fan_speed_display(),
+                fee_rate=r.fee_rate,
                 fee=r.fee)
-            detail.appned(dic)
+            detail.append(dic)
 
         for d in detail:
             print(d)
         return detail
 
     @staticmethod
-    def print_details(user_id, room_id):
+    def print_details(room_id):
         """
         打印详单
         :param room_id: 房间号
@@ -312,22 +313,20 @@ class Bills:
         :param end_date: endDay
         :return:    返回详单字典列表
         """
-        rdr = Bills.get_details(user_id, room_id)
-        import csv
+        rdr = Bills.get_details(room_id)
         # 文件头，一般就是数据名
-        file_header = ["request_id",
-                       "request_time",
-                       "room_id",
-                       "operation",
-                       "current_temp",
-                       "target_temp",
-                       "fan_speed",
-                       "fee"]
+        file_header = ["room_id",
+                    "request_time",
+                    "server_begin_time",
+                    "server_over_time",
+                    "serve_time",
+                    "fan_speed",
+                    "fee_rate",
+                    "fee"]
 
         # 写入数据，如果没有文件夹就创建一个
-        directory = "./details/"
-        os.makedirs(directory, exist_ok=True)
-        with open("./details/{}.csv".format(room_id), "w") as csvFile:
+        os.makedirs(report_saving_path, exist_ok=True)
+        with open(report_saving_path+"/{}.csv".format(room_id), "w") as csvFile:
             writer = csv.DictWriter(csvFile, file_header)
             writer.writeheader()
             # 写入的内容都是以列表的形式传入函数
@@ -405,21 +404,21 @@ class Reports:
         current_record = Room.objects.filter(room_id=room_id).order_by('-request_time').first()
         if current_record:
             status = {}
-            status['current_temp'] = current_record.current_temp
-            status['current_speed'] = current_record.fan_speed
-            status['target_temp'] = current_record.target_temp
-            status['fee'] = current_record.fee
+            status['cur_tem'] = current_record.current_temp
+            status['cur_wind'] = current_record.fan_speed
+            status['target_tem'] = current_record.target_temp
+            status['air_condition'] = current_record.get_state_display()
         else:
             # 不知道有没有必要写
             status = {}
             status['current_temp'] = 26
             status['current_speed'] = 0
             status['target_temp'] = 'not set'
-            status['fee'] = 0
-        return current_record
+            status['air_condition'] = 0
+        return status
 
     @staticmethod
-    def get_current_report(request, room_id):
+    def get_current_report(request):
         '''
         交互————管理员或前台监控
         缺少消费总金额计算
@@ -433,3 +432,50 @@ class Reports:
             home_status[room_id] = Reports.current_status(room_id)
         print({'home_status': home_status})
         return render(request, 'manager_air.html', {'status': home_status})
+
+    @staticmethod
+    def current_front(room_id):
+        current_record = Room.objects.filter(room_id=room_id).order_by('-request_time').first()
+
+        user = User.objects.filter(room_id=room_id).first()
+
+        if user:
+            status = {}
+            status['checkin_time'] = user.begin_date
+            status['checkout_time'] = user.out_date
+            status['sum_fee'] = Bills.cal_fee(room_id)[1]
+        else:
+            status = {}
+            status['checkin_time'] = 'None'
+            status['checkout_time'] = 'None'
+            status['sum_fee'] = 0
+        return status
+
+    @staticmethod
+    def front(request):
+        '''
+        交互————酒店前台
+        '''
+        all_room_ids = Room.objects.values_list('room_id', flat=True).distinct()
+        home_status = {}
+        # 打印所有房间号
+        for room_id in all_room_ids:
+            home_status[room_id] = Reports.current_front(room_id)
+        print({'home_status': home_status})
+        return render(request, 'manager_system.html',{'status':home_status})
+
+    @staticmethod
+    def download_file(request):
+        room_id='101'
+        Bills.print_details(room_id)
+        file_name = '{}.jpg'.format(room_id)
+
+        with open(report_saving_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/octet-stream")
+            response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_name)
+            return response
+
+
+
+# conda activate django_env
+# python manage.py runserver

@@ -219,10 +219,10 @@ function updateStatus() {
         .then(response => response.json())
         .then(data => {
             // 假设服务器返回的数据格式是 { cur_tem: '...', cur_wind: '...', cost: '...', sum_cost: '...', ac_status: '...' }
-            document.getElementById('cur_tem').textContent = data.cur_tem;
+            document.getElementById('cur_tem').textContent = parseInt(data.cur_tem);
             document.getElementById('cur_wind').textContent = data.cur_wind;
-            document.getElementById('cost').textContent = data.cost;
-            document.getElementById('sum_cost').textContent = data.sum_cost;
+            document.getElementById('cost').textContent = parseFloat(data.cost).toFixed(2);
+            document.getElementById('sum_cost').textContent = parseFloat(data.sum_cost).toFixed(2);
 
             // 更新空调状态
             document.getElementById('room_state').textContent = data.ac_status;

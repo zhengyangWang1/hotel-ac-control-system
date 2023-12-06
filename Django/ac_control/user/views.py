@@ -404,7 +404,7 @@ class Reports:
         return current_record
 
     @staticmethod
-    def get_current_report(request, room_id):
+    def get_current_report(request):
         '''
         交互————管理员或前台监控
         缺少消费总金额计算
@@ -416,4 +416,4 @@ class Reports:
         # 打印所有房间号
         for room_id in all_room_ids:
             home_status[room_id] = Reports.current_status(room_id)
-        return render(request, '', {'status': home_status})
+        return render(request, 'manager_air.html', {'status': home_status})

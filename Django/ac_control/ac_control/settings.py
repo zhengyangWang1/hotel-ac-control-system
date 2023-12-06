@@ -90,10 +90,7 @@ DATABASES = {
         "NAME": "django",  # 数据库名字
         "USER": 'root',  # 用户名
         'PASSWORD': '123456',
-
-
         'HOST': '127.0.0.1',  # 主机
-
         'PORT': '3306',
     }
 }

@@ -30,7 +30,8 @@
             <div class="modal-content">
               <span class="close" onclick="closeRegisterForm()">&times;</span>
               <h2>注册</h2>
-              <form id="checkInForm" >
+              <form id="checkInForm" action="{% url 'manager:register_manager' %}" method="post">
+                {% csrf_token %}
                 <label for="identity">选择身份:</label>
                 <select id="identity" name="identity">
                   <option value="air_service">空调管理员</option>
@@ -58,7 +59,8 @@
                 <span class="close" onclick="closeloginForm()">&times;</span>
                 <h2>进入房间</h2>
                 
-                <form id="checkInForm" >
+                <form id="checkInForm" action="{% url 'manager:login_manager' %}" method="post">
+                    {% csrf_token %}
                     <label for="identity">选择身份:</label>
                     <select id="identity1" name="identity1">
                         <option value="air_service">空调管理员</option>

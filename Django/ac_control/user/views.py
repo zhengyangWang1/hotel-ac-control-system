@@ -164,6 +164,7 @@ def change_ac_state(request):
         new_state = '等待'
     elif room.state == 3:
         new_state = '关机'
+        room_b.on_flag[int(room_id)-100] = False
     if room.fan_speed == 1:
         wind = '低风'
     elif room.fan_speed == 2:

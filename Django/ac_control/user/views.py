@@ -20,23 +20,14 @@ report_saving_path = 'E:/report'
 # Create your views here.
 class RoomsInfo:  # 监控器使用
     def __init__(self, rooms):
-        self.dic = {
-            "room_id": [0],
-            "state": [""],
-            "fan_speed": [""],
-            "current_temp": [0],
-            "fee": [0],
-            "target_temp": [0],
-            "fee_rate": [0]
-        }
+        self.dic = {}
         if rooms:
             for room in rooms:  # 从1号房开始
                 self.dic[room.room_id]={}
                 self.dic[room.room_id]["cur_wind"].append(speed_ch[room.fan_speed])
                 self.dic[room.room_id]["cur_tem"].append('%.2f' % room.current_temp)
-                # self.dic["fee"].append('%.2f' % room.fee)
                 self.dic[room.room_id]["target_tem"].append(room.target_temp)
-                # self.dic["fee_rate"].append(room.fee_rate)
+        print(self.dic)
 
 
 class RoomBuffer:  # 房间数据缓存

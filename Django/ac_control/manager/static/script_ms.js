@@ -99,9 +99,9 @@ function filterTable() {
 }
 
 
-function downloadFile() {
+function downloadFile(room_id) {
     var a = document.createElement('a');
-    a.href = '/manager/download/';
+    a.href = '/manager/download/?room_id=' + room_id;
     a.style.display = 'none';
     document.body.appendChild(a);
     a.click();

@@ -501,9 +501,9 @@ def login_manager(request):
         try:
             manager = Manager.objects.get(manager_type=manager_type, manager_name=manager_name, password=manager_password)
             if manager_type=='air_service':
-                return render(request, 'manager_air.html')
+                return redirect('manager:monitor')
             else:
-                return render(request,'manager_system.html')
+                return redirect('manager:front')
 
         except Manager.DoesNotExist:
             # 如果用户不存在或密码不匹配，返回登录页面或其他提示页面

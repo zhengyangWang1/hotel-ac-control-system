@@ -97,3 +97,15 @@ function filterTable() {
         }       
     }
 }
+
+
+function downloadFile() {
+    var a = document.createElement('a');
+    a.href = '/manager/download/';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+

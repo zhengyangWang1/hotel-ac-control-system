@@ -58,36 +58,6 @@ modeSelector.addEventListener("change", function() {
 modeSelector.setAttribute('data-prev', modeSelector.value);
 
 
-function toggleAC() {
-    var room_id = document.querySelector('input[name="room_id"]').value;
-    var newState = isACOn ? 'off' : 'on'; // 根据当前状态决定新状态
-
-    // 发送AJAX请求
-    $.ajax({
-        type: "POST",
-        url: newState === 'on' ? '/open_ac' : '/close_ac', // 根据状态选择URL
-        data: { room_id: room_id },
-        success: function(response) {
-            // 根据响应更新状态
-            isACOn = newState === 'on';
-            acToggleBtn.textContent = isACOn ? "关闭" : "开启";
-            acStatusText.textContent = isACOn ? "空调已开启" : "空调已关闭";
-
-            // 根据空调状态启用或禁用控件
-            if (isACOn) {
-                enableControls();
-            } else {
-                disableControls();
-            }
-        },
-        error: function(error) {
-            console.error("Error:", error);
-            alert('无法更改空调状态！');
-        }
-    });
-}
-
-
  //退房函数
  document.getElementById('checkout').addEventListener('click', function(event) {
     event.preventDefault(); // 阻止链接默认行为
@@ -128,6 +98,15 @@ function handleAcAction_roomState(event) {
     .then(data => {
         // 假设后端返回的数据包含room_state字段
         document.getElementById('room_state').textContent = data.room_state;
+        room_id = data.room
+
+        // 如果空调状态为"开启"，设置温度为 22°C 和风速为中风
+        if (data.room_state === '开启') {
+        document.getElementById('temperature-slider').value = '22';
+        document.getElementById('temperature').innerText = '22°C';
+        document.getElementById('fan-speed-slider').value = '2';
+        document.getElementById('fan-speed').innerText = '中风';
+        }
     })
     .catch(error => console.error('Error:', error));
 }
@@ -219,10 +198,10 @@ function updateStatus() {
         .then(response => response.json())
         .then(data => {
             // 假设服务器返回的数据格式是 { cur_tem: '...', cur_wind: '...', cost: '...', sum_cost: '...', ac_status: '...' }
-            document.getElementById('cur_tem').textContent = data.cur_tem;
+            document.getElementById('cur_tem').textContent = parseInt(data.cur_tem);
             document.getElementById('cur_wind').textContent = data.cur_wind;
-            document.getElementById('cost').textContent = data.cost;
-            document.getElementById('sum_cost').textContent = data.sum_cost;
+            document.getElementById('cost').textContent = parseFloat(data.cost).toFixed(2);
+            document.getElementById('sum_cost').textContent = parseFloat(data.sum_cost).toFixed(2);
 
             // 更新空调状态
             document.getElementById('room_state').textContent = data.ac_status;
@@ -233,6 +212,7 @@ function updateStatus() {
 }
 
 // 设置定时器，每秒调用一次updateStatus函数
-setInterval(updateStatus, 1000);
+setInterval(updateStatus, 100);
+
 
 

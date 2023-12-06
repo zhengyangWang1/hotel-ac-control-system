@@ -81,9 +81,9 @@ class Room(models.Model):
     # 当前温度
     current_temp = models.IntegerField('当前温度', null=False, default=26.0)
     # 目标温度
-    target_temp = models.IntegerField('目标温度', null=False, default=0.0)
+    target_temp = models.IntegerField('目标温度', null=False, default=22.0)
     # 房间空调的风速
-    fan_speed = models.IntegerField(verbose_name='风速', choices=FAN_SPEED, default=0)
+    fan_speed = models.IntegerField(verbose_name='风速', choices=FAN_SPEED, default=2)
     # 房间状态
     state = models.IntegerField(verbose_name='服务状态', choices=ROOM_STATE, default=3)
     # 操作类型
@@ -99,6 +99,15 @@ class Room(models.Model):
     class Meta:
         db_table = 'Room'
 
+
+    def __init__(self, *args, **kwargs):
+        super(Room, self).__init__(*args, **kwargs)
+        # 记录原始属性值
+        self._original_target_temp = self.target_temp
+
+    def target_temp_has_changed(self):
+        # 检查属性是否发生变化
+        return hasattr(self, '_original_target_temp') and self.target_temp != self._original_target_temp
 
 
 

@@ -99,6 +99,14 @@ function handleAcAction_roomState(event) {
         // 假设后端返回的数据包含room_state字段
         document.getElementById('room_state').textContent = data.room_state;
         room_id = data.room
+
+        // 如果空调状态为"开启"，设置温度为 22°C 和风速为中风
+        if (data.room_state === '开启') {
+        document.getElementById('temperature-slider').value = '22';
+        document.getElementById('temperature').innerText = '22°C';
+        document.getElementById('fan-speed-slider').value = '2';
+        document.getElementById('fan-speed').innerText = '中风';
+        }
     })
     .catch(error => console.error('Error:', error));
 }

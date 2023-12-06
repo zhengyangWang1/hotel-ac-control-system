@@ -53,13 +53,14 @@ class Queue(View):
                 room.serve_time += 1
             if queue_type == 2:
                 room.wait_time += 1
-        timer = Timer(60, lambda: self.update_time(queue_type))  # 每1min执行一次函数
+        timer = Timer(10, lambda: self.update_time(queue_type))  # 每1min执行一次函数
         timer.start()
 
 
 class ServingQueue(Queue):
     serving_num = 0
     queue_type = 1  # 1为服务状态
+    room_list = []
 
     def insert(self, room, queue_type=1):
         super().insert(room, queue_type=queue_type)
@@ -90,10 +91,10 @@ class ServingQueue(Queue):
                     room.current_temp += 0.05
                     room.fee += 0.05
                 else:
-                    room.current_temp += 1/30
+                    room.current_temp += 1 / 30
                     room.fee = room.fee + 0.03
                 # print(room.current_temp)
-            timer = Timer(0.1, self.auto_update_fee, [1])
+            timer = Timer(1, self.auto_update_fee, [1])
             timer.start()
         else:
             for room in self.room_list:
@@ -113,6 +114,7 @@ class ServingQueue(Queue):
 class WaitingQueue(Queue):
     waiting_num = 0
     queue_type = 2  # 2为等待状态
+    room_list = []
 
     def insert(self, room, queue_type=2):
         super().insert(room, queue_type=queue_type)
@@ -180,12 +182,12 @@ class Scheduler(View):  # 在views里直接创建
                 room.target_temp = 22
                 room.fan_speed = 2
                 flag = 0
-                if self.SQ.serving_num < 3:  # 服务队列未满
+                if len(self.SQ.room_list) < 3:  # 服务队列未满
                     self.SQ.insert(room)
                     room.sever_begin_time = timezone.now()
                 else:  # 服务队列已满
                     self.WQ.insert(room)
-
+                    room.wait_time = 20
                 return_room = room
                 #  写入数据库
                 room.request_time = timezone.now()
@@ -206,11 +208,12 @@ class Scheduler(View):  # 在views里直接创建
             temp_room.target_temp = 22
             temp_room.fan_speed = 2
             self.rooms.append(temp_room)
-            if self.SQ.serving_num < 3:  # 服务队列未满
+            if len(self.SQ.room_list) < 3:  # 服务队列未满
                 self.SQ.insert(temp_room)
                 temp_room.sever_begin_time = timezone.now()
             else:  # 服务队列已满
                 self.WQ.insert(temp_room)
+                temp_room.wait_time = 20
 
             return_room = temp_room
             #  写入数据库
@@ -236,7 +239,6 @@ class Scheduler(View):  # 在views里直接创建
                 else:
                     room.state = 3
 
-
                 self.back_temp(room, 1)
 
                 # 写入数据库
@@ -245,8 +247,6 @@ class Scheduler(View):  # 在views里直接创建
                 room.operation = 4
                 room.request_time = timezone.now()
                 room.save(force_insert=True)
-
-
 
                 # 开启资源充足的调度
                 severing_num = len(self.SQ.room_list)
@@ -352,7 +352,7 @@ class Scheduler(View):  # 在views里直接创建
         self.check_target_arrive()
         # 开启调度队列和等待队列的计时功能
         self.SQ.update_serve_time()
-        self.WQ.update_wait_time()
+        # self.WQ.update_wait_time()
 
         return self.state
 
@@ -382,13 +382,11 @@ class Scheduler(View):  # 在views里直接创建
         if room.state == 3:
             if mode == 1:
                 if room.current_temp > room.init_temp:
-                    print(room.current_temp)
-                    print(room.init_temp)
+                    # print(room.current_temp)
+                    # print(room.init_temp)
                     room.current_temp -= 0.05
                 timer = threading.Timer(0.1, self.back_temp, [room, 1])  # 每1秒执行一次函数
                 timer.start()
-
-
 
     def scheduling(self):
         # 资源足够的情况
@@ -403,88 +401,78 @@ class Scheduler(View):  # 在views里直接创建
 
         # 资源不足的情况
         elif len(self.WQ.room_list) != 0 and len(self.SQ.room_list) == 3:
-            request_room = self.WQ.room_list[0]
-
-            # 优先级调度启动
-            available_room1 = [room for room in self.SQ.room_list if room.fan_speed < request_room.fan_speed]
-            # 时间片调度启动
-            available_room2 = [room for room in self.SQ.room_list if room.fan_speed == request_room.fan_speed]
-            if available_room1:
-                self.priority_scheduling(available_room1, request_room)  # 优先级调度
-            elif available_room2:
-                self.time_slice_scheduling(request_room)  # 时间片轮询调度
-            else:
-                if len(self.SQ.room_list) >= 3:
-                    self.WQ.insert(request_room)
-                else:
-                    self.SQ.insert(request_room)
-                    request_room.wait_time = 0  # 分配等待服务时长
-
-        timer = threading.Timer(10, self.scheduling)  # 每2min执行一次调度函数
+            self.priority_scheduling()
+            self.time_slice_scheduling()
+        #     request_room = self.WQ.room_list[0]
+        #
+        #     # 优先级调度启动
+        #     available_room1 = [room for room in self.SQ.room_list if room.fan_speed < request_room.fan_speed]
+        #     # 时间片调度启动
+        #     available_room2 = [room for room in self.SQ.room_list if room.fan_speed == request_room.fan_speed]
+        #     if available_room1:
+        #         self.priority_scheduling(available_room1, request_room)  # 优先级调度
+        #     elif available_room2:
+        #         self.time_slice_scheduling(request_room)  # 时间片轮询调度
+        #     else:
+        #         if len(self.SQ.room_list) >= 3:
+        #             self.WQ.insert(request_room)
+        #         else:
+        #             self.SQ.insert(request_room)
+        #             request_room.wait_time = 0  # 分配等待服务时长
+        #
+        timer = threading.Timer(1, self.scheduling)  # 每2min执行一次调度函数
         timer.start()
 
     # 优先级调度
-    def priority_scheduling(self, rooms, request_room):
+    def priority_scheduling(self):
         '''
         优先级调度
         '''
-        # 找出风速最小的房间
-        min_fan_speed = min(rooms, key=lambda x: x.fan_speed).fan_speed
-        min_fan_speed_rooms = list(filter(lambda x: x.fan_speed == min_fan_speed, rooms))
-        # 按服务时间对房间进行排序
-        sorted_rooms = sorted(min_fan_speed_rooms, key=lambda x: x.serve_time, reverse=True)
-        self.SQ.delete(sorted_rooms[0])
-        self.WQ.insert(sorted_rooms[0])
-        sorted_rooms[0].wait_time = 0  # 等待与服务时间的分配与用处  ？？？？？?
-        self.SQ.insert(request_room)
-        request_room.sever_time = 0
+        for r in self.WQ.room_list:
+            available_room1 = [room for room in self.SQ.room_list if room.fan_speed < r.fan_speed]
+            if available_room1:
+                # 找出风速最小那一档的所有房间
+                min_fan_speed = min(available_room1, key=lambda x: x.fan_speed).fan_speed
+                min_fan_speed_rooms = list(filter(lambda x: x.fan_speed == min_fan_speed, available_room1))
+                # 按服务时间对房间进行排序
+                sorted_rooms = sorted(min_fan_speed_rooms, key=lambda x: x.serve_time, reverse=True)
+                self.SQ.delete(sorted_rooms[0])
+                self.WQ.delete(r)
+                self.SQ.insert(r)
+                r.serve_time = 0
+                self.WQ.insert(sorted_rooms[0])
+                sorted_rooms[0].wait_time = 20
 
     # 时间片调度
-    def time_slice_scheduling(self, request_room):
-        clock = 120
-
-        #  奇奇怪怪 是要每一个房间都分配一个服务时间好像
-        # 不太对
-
-        while clock != 0:
-            if self.check_condition():
-                min_wait_serve_time_room = min(self.WQ.room_list, key=lambda x: x.wait_serve_time)
-                self.WQ.delete(min_wait_serve_time_room)
-                self.SQ.insert(min_wait_serve_time_room)
-                min_wait_serve_time_room.wait_time = 0
-                break
-
+    def time_slice_scheduling(self):
+        for r in self.WQ.room_list:
+            if r.wait_time > 0:
+                r.wait_time -= 1
             else:
-                clock -= 1
-            time.sleep(1)
-
-        # 判断是如何跳出循环的
-        if clock <= 0:
-            # 没有服务状态变化，释放服务队列中服务时长最大的服务对象
-            max_serve_time_room = max(self.SQ.room_list, key=lambda x: x.serve_time)
-            self.SQ.delete(max_serve_time_room)
-            self.WQ.insert(max_serve_time_room)
-            self.SQ.insert(request_room)
-            request_room.serve_time = 0
-            max_serve_time_room.wait_time = 0  # 分配等待服务时长
-
-    def check_condition(self):  # 时间片轮转跳出条件
-        if any(self.check_target_arrive or room.state == 3 for room in self.SQ.room_list):  # 还没实现达到温度与关机函数
-            return True
+                available_room2 = [room for room in self.SQ.room_list if room.fan_speed == r.fan_speed]
+                if available_room2:
+                    # 没有服务状态变化，释放服务队列中服务时长最大的服务对象
+                    max_serve_time_room = max(self.SQ.room_list, key=lambda x: x.serve_time)
+                    self.SQ.delete(max_serve_time_room)
+                    self.WQ.delete(r)
+                    self.SQ.insert(r)
+                    r.serve_time = 0
+                    self.WQ.insert(max_serve_time_room)
+                    max_serve_time_room.wait_time = 20
 
     def check_target_arrive(self):  # 检查达到目标温度与否
         if len(self.SQ.room_list) != 0:
             for room in self.SQ.room_list:
-                if abs(room.current_temp - room.target_temp) < 0.1 or room.current_temp > room.target_temp:
-                    print(room.current_temp)
-                    print(room.target_temp)
+                if abs(room.current_temp - room.target_temp) < 0.0001 or room.current_temp > room.target_temp:
+                    # print(room.current_temp)
+                    # print(room.target_temp)
                     self.request_off(room.room_id)
+
                     # self.SQ.delete(room)
                     # if self.default_target_temp == 22:
                     #     self.back_temp(room, 1)
                     # else:
                     #     self.back_temp(room, 2)
-
 
         # 不懂下面这段什么意义
         # if self.WQ.waiting_num != 0:
@@ -496,7 +484,7 @@ class Scheduler(View):  # 在views里直接创建
         #                 self.back_temp(room, 1)
         #             else:
         #                 self.back_temp(room, 2)
-        timer = threading.Timer(1, self.check_target_arrive)  # 每5秒执行一次check函数
+        timer = threading.Timer(0.05, self.check_target_arrive)  # 每5秒执行一次check函数
         timer.start()
 
 

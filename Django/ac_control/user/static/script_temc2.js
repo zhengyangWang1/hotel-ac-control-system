@@ -212,7 +212,7 @@ function updateStatus() {
 }
 
 // 设置定时器，每秒调用一次updateStatus函数
-setInterval(updateStatus, 1000);
+setInterval(updateStatus, 100);
 
 
 

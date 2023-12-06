@@ -118,15 +118,24 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
         init_temp = 12
     else:
         init_temp = 14
-    room = scheduler.request_on(room_id, user_id, init_temp)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
-    if room.state == 1:
-        # 打开空调
-        room_state = '开启'
-    else:
-        # 等待资源中
-        room_state = '等待'
-
-    context = {'room_state': room_state, 'room': room_id}
+    if not room_b.on_flag[int(room_id) - 100]:
+        room_b.on_flag[int(room_id) - 100] = True  # 开机
+        room = scheduler.request_on(room_id, user_id, init_temp)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
+        if room.state == 1:
+            # 打开空调
+            room_state = '开启'
+        else:
+            # 等待资源中
+            room_state = '等待'
+        # print(room.target_temp, type(room.target_temp))
+        # print(room.fan_speed, type(room.fan_speed))
+        if room.fan_speed == 1:
+            wind = '低风'
+        elif room.fan_speed == 2:
+            wind = '中风'
+        else:
+            wind = '高风'
+    context = {'room_state': room_state, 'room': room_id, 'target_temp': room.target_temp, 'fan_speed': wind}
     return JsonResponse(context)
 
 
@@ -143,10 +152,10 @@ def change_ac_state(request):
     # 从rooms中找
     rooms = scheduler.rooms
     for r in rooms:
-        print('rooms中得到的room_id:', r.room_id, '，数据类型：', type(r.room_id))  # str类型
-        print('从前端获得的room_id:', room_id, '，数据类型：', type(room_id))  # str类型
+        # print('rooms中得到的room_id:', r.room_id, '，数据类型：', type(r.room_id))  # str类型
+        # print('从前端获得的room_id:', room_id, '，数据类型：', type(room_id))  # str类型
         if r.room_id == room_id:
-            print('找到room啦')
+            # print('找到room啦')
             room = r
 
     if room.state == 1:
@@ -155,8 +164,6 @@ def change_ac_state(request):
         new_state = '等待'
     elif room.state == 3:
         new_state = '关机'
-    else:
-        new_state = '休眠'
     if room.fan_speed == 1:
         wind = '低风'
     elif room.fan_speed == 2:
@@ -175,6 +182,7 @@ def close_ac(request):
     """把room对象从room_list中移除"""
     room_id = request.POST.get('room_id')
     room = scheduler.request_off(room_id)
+    room_b.on_flag[int(room_id)-100] = False
     room_state = '关机'
     context = {'room_state': room_state}
     return JsonResponse(context)
@@ -185,12 +193,13 @@ def change_temp_wind(request):
     room_id = request.POST.get('room_id')
     temp = int(request.POST.get('temperature'))  # 前端传来时为str，需要转化为int
     wind_speed = int(request.POST.get('fan_speed'))
-    print(wind_speed, type(wind_speed))
+    print(temp, type(temp))
     # 更新参数
-    scheduler.change_target_temp(room_id, temp)  # 改变room的target_temp属性，写入数据库
-    scheduler.change_fan_speed(room_id, wind_speed)  # 改变room的fan_speed属性，写入数据库
-    return JsonResponse({'status': 'success'})
-
+    if room_b.on_flag[int(room_id)-100]:
+        scheduler.change_target_temp(room_id, temp)  # 改变room的target_temp属性，写入数据库
+        scheduler.change_fan_speed(room_id, wind_speed)  # 改变room的fan_speed属性，写入数据库
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'fail'})
 
 # ============管理员===========
 def init(request):
@@ -205,10 +214,9 @@ def init_submit(request):
     fee_h = float(request.GET['fee_h'])
     fee_m = float(request.GET['fee_m'])
     fee_l = float(request.GET['fee_l'])
-    for i in range(1, 6):
-        room_b.init_temp[i] = int(request.GET['r' + str(i)])
+    # for i in range(1, 6):
+    #     room_b.init_temp[i] = int(request.GET['r' + str(i)])
 
-    print(room_b.init_temp)
     scheduler.set_para(high, low, default, fee_h, fee_l, fee_m)
     scheduler.power_on()
     scheduler.start_up()
@@ -217,7 +225,7 @@ def init_submit(request):
 
 def monitor(request):
     rooms = scheduler.check_room_state()
-    print(rooms)
+    # print(rooms)
     return render(request, 'monitor.html', RoomsInfo(rooms).dic)
 
 

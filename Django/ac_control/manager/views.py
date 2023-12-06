@@ -84,16 +84,16 @@ class ServingQueue(Queue):
         if mode == 1:
             for room in self.room_list:
                 if room.fan_speed == 3:
-                    room.current_temp += 1
-                    room.fee += 1
+                    room.current_temp += 0.1
+                    room.fee += 0.1
                 elif room.fan_speed == 2:
-                    room.current_temp += 1
-                    room.fee += 0.5
+                    room.current_temp += 0.05
+                    room.fee += 0.05
                 else:
-                    room.current_temp += 1
-                    room.fee = room.fee + (1 / 3)
-                print(room.current_temp)
-            timer = Timer(1, self.auto_update_fee, [1])
+                    room.current_temp += 1/30
+                    room.fee = room.fee + 0.03
+                # print(room.current_temp)
+            timer = Timer(0.1, self.auto_update_fee, [1])
             timer.start()
         else:
             for room in self.room_list:
@@ -177,6 +177,8 @@ class Scheduler(View):  # 在views里直接创建
         for room in self.rooms:
             if room.room_id == room_id:  # 不是第一次开机，直接处理
                 room.user_id = user_id
+                room.target_temp = 22
+                room.fan_speed = 2
                 flag = 0
                 if self.SQ.serving_num < 3:  # 服务队列未满
                     self.SQ.insert(room)
@@ -201,6 +203,8 @@ class Scheduler(View):  # 在views里直接创建
             temp_room.init_temp = init_temp  # 11
             temp_room.current_temp = init_temp  # 11
             temp_room.user_id = user_id
+            temp_room.target_temp = 22
+            temp_room.fan_speed = 2
             self.rooms.append(temp_room)
             if self.SQ.serving_num < 3:  # 服务队列未满
                 self.SQ.insert(temp_room)
@@ -220,8 +224,7 @@ class Scheduler(View):  # 在views里直接创建
     def request_off(self, room_id):  # 将指定房间状态设为3：关闭
         for room in self.SQ.room_list:
             if room.room_id == room_id:
-                # 房间回到初始温度
-                room.current_temp = room.init_temp  # 为什么房间直接回到初始温度？
+
                 # 修改房间状态
                 if room.state == 1:  # 服务队列中
                     room.state = 3
@@ -232,12 +235,18 @@ class Scheduler(View):  # 在views里直接创建
                     self.WQ.delete(room)
                 else:
                     room.state = 3
+
+
+                self.back_temp(room, 1)
+
                 # 写入数据库
                 room.request_id = self.request_id
                 self.request_id += 1
                 room.operation = 4
                 room.request_time = timezone.now()
                 room.save(force_insert=True)
+
+
 
                 # 开启资源充足的调度
                 severing_num = len(self.SQ.room_list)
@@ -265,7 +274,6 @@ class Scheduler(View):  # 在views里直接创建
                     room.target_temp = target_temp
 
                 # 写入数据库
-                room.target_temp = target_temp
                 room.request_id = self.request_id
                 self.request_id += 1
                 room.operation = 1
@@ -359,17 +367,28 @@ class Scheduler(View):  # 在views里直接创建
         '''
         回温
         '''
-        if room.state == 4:
+        # if room.state == 4:
+        #     if mode == 1:
+        #         if room.current_temp > room.init_temp:
+        #             room.current_temp -= 0.008
+        #             if room.target_temp_has_changed():
+        #                 print(room.target_temp_has_changed())
+        #                 if self.SQ.serving_num < 3:  # 服务队列没满
+        #                     self.SQ.insert(room)
+        #                 else:
+        #                     self.WQ.insert(room)
+        #             timer = threading.Timer(1, self.back_temp, [room, 1])  # 每1秒执行一次函数
+        #             timer.start()
+        if room.state == 3:
             if mode == 1:
                 if room.current_temp > room.init_temp:
-                    room.current_temp -= 0.008
-                    if room.target_temp_has_changed():
-                        if self.SQ.serving_num < 3:  # 服务队列没满
-                            self.SQ.insert(room)
-                        else:
-                            self.WQ.insert(room)
-                    timer = threading.Timer(1, self.back_temp, [room, 1])  # 每1秒执行一次函数
-                    timer.start()
+                    print(room.current_temp)
+                    print(room.init_temp)
+                    room.current_temp -= 0.05
+                timer = threading.Timer(0.1, self.back_temp, [room, 1])  # 每1秒执行一次函数
+                timer.start()
+
+
 
     def scheduling(self):
         # 资源足够的情况
@@ -459,12 +478,13 @@ class Scheduler(View):  # 在views里直接创建
                 if abs(room.current_temp - room.target_temp) < 0.1 or room.current_temp > room.target_temp:
                     print(room.current_temp)
                     print(room.target_temp)
-                    room.state = 4
-                    self.SQ.delete(room)
-                    if self.default_target_temp == 22:
-                        self.back_temp(room, 1)
-                    else:
-                        self.back_temp(room, 2)
+                    self.request_off(room.room_id)
+                    # self.SQ.delete(room)
+                    # if self.default_target_temp == 22:
+                    #     self.back_temp(room, 1)
+                    # else:
+                    #     self.back_temp(room, 2)
+
 
         # 不懂下面这段什么意义
         # if self.WQ.waiting_num != 0:

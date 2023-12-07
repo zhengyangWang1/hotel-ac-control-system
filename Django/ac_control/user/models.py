@@ -41,9 +41,9 @@ class User(models.Model):
 class Room(models.Model):
     # 风速范围
     FAN_SPEED = [
-        (3, "高"),
-        (2, "中"),
-        (1, "低"),
+        (3, "high"),
+        (2, "middle"),
+        (1, "low"),
     ]
     # 房间状态
     ROOM_STATE = [

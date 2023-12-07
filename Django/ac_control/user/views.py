@@ -25,10 +25,10 @@ class RoomsInfo:  # 监控器使用
         if rooms:
             for room in rooms:  # 从1号房开始
                 self.dic[room.room_id] = {}
-                self.dic[room.room_id]["cur_wind"]=room.get_fan_speed_display()
-                self.dic[room.room_id]["cur_tem"]='%.2f' % room.current_temp
-                self.dic[room.room_id]["target_tem"]=room.target_temp
-                self.dic[room.room_id]["air_condition"]=room.get_state_display()
+                self.dic[room.room_id]["cur_wind"] = room.get_fan_speed_display()
+                self.dic[room.room_id]["cur_tem"] = '%.2f' % room.current_temp
+                self.dic[room.room_id]["target_tem"] = room.target_temp
+                self.dic[room.room_id]["air_condition"] = room.get_state_display()
                 # {'101': {'cur_wind': '中速', 'cur_tem': '10.40', 'target_tem': 22}}
             
         print(self.dic)
@@ -301,7 +301,6 @@ class Bills:
                 server_over_time=r.sever_over_time,
                 serve_time=r.serve_time,
                 fan_speed=r.get_fan_speed_display(),
-                fee_rate=r.fee_rate,
                 fee=r.fee)
             detail.append(dic)
 
@@ -326,7 +325,6 @@ class Bills:
                        "server_over_time",
                        "serve_time",
                        "fan_speed",
-                       "fee_rate",
                        "fee"]
         print("room_id", room_id)
         # 写入数据，如果没有文件夹就创建一个
@@ -450,7 +448,7 @@ class Reports:
             status = {}
             status['checkin_time'] = user.begin_date
             status['checkout_time'] = user.out_date
-            status['sum_fee'] = Bills.cal_fee(room_id)[1]
+            status['sum_fee'] = Bills.cal_fee(room_id)[0]
         else:
             status = {}
             status['checkin_time'] = 'None'

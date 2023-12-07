@@ -108,8 +108,8 @@ function downloadFile(room_id) {
     document.body.removeChild(a);
 }
 
-
-setInterval(function() {
-    location.reload();
-  }, 3000); // 1000 毫秒，即每隔1秒
-  
+//
+//setInterval(function() {
+//    location.reload();
+//  }, 3000); // 1000 毫秒，即每隔1秒
+//

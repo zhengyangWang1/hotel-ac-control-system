@@ -17,5 +17,5 @@ urlpatterns = [
     # path('login_manager/',views.login_manager),
 
     path('front/',user.views.Reports.front,name='front'),
-    path('download/',user.views.Reports.download_file),
+    path('download/',user.views.monitor),
 ]

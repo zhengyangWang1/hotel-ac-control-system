@@ -73,3 +73,8 @@ function openCity(evt, cityName) {
         button.parentNode.parentNode.parentNode.insertBefore(newDetailsRow, button.parentNode.parentNode.nextSibling);
     }
 }
+
+setInterval(function() {
+    // 这里是您的刷新逻辑
+    // 例如，重新请求数据并更新页面元素
+  }, 1000); // 5000毫秒，即5秒

@@ -25,7 +25,7 @@ class RoomsInfo:  # 监控器使用
         if rooms:
             for room in rooms:  # 从1号房开始
                 self.dic[room.room_id] = {}
-                self.dic[room.room_id]["cur_wind"]=speed_ch[room.fan_speed]
+                self.dic[room.room_id]["cur_wind"]=room.get_fan_speed_display()
                 self.dic[room.room_id]["cur_tem"]='%.2f' % room.current_temp
                 self.dic[room.room_id]["target_tem"]=room.target_temp
                 self.dic[room.room_id]["air_condition"]=room.get_state_display()
@@ -42,7 +42,7 @@ class RoomBuffer:  # 房间数据缓存
 
 # ============静态变量===========
 room_b = RoomBuffer
-speed_ch = ["", "高速", "中速", "低速"]
+speed_ch = ["", "低速", "中速", "高速"]
 state_ch = ["", "服务中", "等待", "关机", "休眠"]
 
 # ===========暂时直接执行，需要时通过管理员执行===========

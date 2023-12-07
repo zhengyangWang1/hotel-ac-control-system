@@ -74,7 +74,8 @@
                         <td>{{ room_id }}</td>
                         <td>{{ s.checkin_time }}</td>
                         <td>{{ s.checkout_time }}</td>
-                        <td>{{ s.sum_fee }}</td>
+                        <td>{{ s.sum_fee|floatformat:2 }}</td>
+
                         <td>
                             <button onclick="downloadFile('{{ room_id }}')" class="button-primary">打印详单</button>
                             <button class="button-danger">退房</button>

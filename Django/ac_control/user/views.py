@@ -406,7 +406,7 @@ class Reports:
         if current_record:
             status = {}
             status['cur_tem'] = current_record.current_temp
-            status['cur_wind'] = current_record.fan_speed
+            status['cur_wind'] = current_record.get_fan_speed_display()
             status['target_tem'] = current_record.target_temp
             status['air_condition'] = current_record.get_state_display()
         else:

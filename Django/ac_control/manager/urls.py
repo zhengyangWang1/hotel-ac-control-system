@@ -9,13 +9,14 @@ app_name='manager'
 urlpatterns = [
     # 管理员端
     path('', views.login),
-    path('register_manager/',views.registration_manager,name='register_manager'),
-    path('login_manager/',views.login_manager,name='login_manager'),
-    path('monitor/',user.views.monitor,name='monitor'),
+    path('register_manager/', views.registration_manager,name='register_manager'),
+    path('login_manager/', views.login_manager,name='login_manager'),
+    path('monitor/', user.views.monitor,name='monitor'),
 
     # path('register_manager/',views.registration_manager),
     # path('login_manager/',views.login_manager),
 
     path('front/',user.views.Reports.front,name='front'),
     path('download/',user.views.Reports.download_file),
+    # path('monitor-api/', user.views.monitor_api, name='monitor-api'),  # 添加这一行
 ]

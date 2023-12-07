@@ -330,7 +330,7 @@ class Scheduler(View):  # 在views里直接创建
         '''
         更新self.rooms
         '''
-        timer = threading.Timer(5, self.check_room_state)  # 每五秒执行一次check函数,list_room为参数
+        timer = threading.Timer(1, self.check_room_state)  # 每五秒执行一次check函数,list_room为参数
         timer.start()
         return self.rooms
 
@@ -413,7 +413,6 @@ class Scheduler(View):  # 在views里直接创建
         # print("等待队列:")
         # for room in self.WQ.room_list:
         #     print(room.room_id)
-
         #     request_room = self.WQ.room_list[0]
         #
         #     # 优先级调度启动
@@ -512,7 +511,6 @@ class Scheduler(View):  # 在views里直接创建
 
 def login(request):
     return render(request, 'manager_login.html')
-
 
 def login_manager(request):
     if request.method == 'POST':

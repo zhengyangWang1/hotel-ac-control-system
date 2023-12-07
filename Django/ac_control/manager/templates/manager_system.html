@@ -76,8 +76,10 @@
                         <td>{{ s.checkout_time }}</td>
                         <td>{{ s.sum_fee }}</td>
                         <td>
-                            <button onclick="downloadFile()" class="button-primary">打印详单</button>
+                            <button onclick="downloadFile('{{ room_id }}')" class="button-primary">打印详单</button>
                             <button class="button-danger">退房</button>
+
+
                         </td>
                     </tr>
                     {% endfor %}

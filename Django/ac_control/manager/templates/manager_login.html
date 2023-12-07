@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <title>波普特酒店空调管理</title>
-    <link rel="stylesheet" type="text/css" href="../static/style_ad.css">
-
+    <link rel="stylesheet" type="text/css" href="{% static 'styles_ad.css' %}">
     
 </head>
 <body>
@@ -30,7 +30,8 @@
             <div class="modal-content">
               <span class="close" onclick="closeRegisterForm()">&times;</span>
               <h2>注册</h2>
-              <form id="checkInForm" >
+              <form id="checkInForm" action="{% url 'manager:register_manager' %}" method="post">
+                {% csrf_token %}
                 <label for="identity">选择身份:</label>
                 <select id="identity" name="identity">
                   <option value="air_service">空调管理员</option>
@@ -58,7 +59,8 @@
                 <span class="close" onclick="closeloginForm()">&times;</span>
                 <h2>进入房间</h2>
                 
-                <form id="checkInForm" >
+                <form id="checkInForm" action="{% url 'manager:login_manager' %}" method="post">
+                    {% csrf_token %}
                     <label for="identity">选择身份:</label>
                     <select id="identity1" name="identity1">
                         <option value="air_service">空调管理员</option>
@@ -91,6 +93,6 @@
 
 
 
-    <script src="../static/script_ad.js"></script>
+    <script src="{% static 'script_ad.js' %}"></script>
 </body>
 </html>

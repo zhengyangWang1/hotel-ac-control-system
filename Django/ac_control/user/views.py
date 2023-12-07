@@ -15,29 +15,23 @@ import os
 import json
 from django.http import HttpResponse
 
-report_saving_path = 'D:/report'
+report_saving_path = 'E:/report'
+
 
 # Create your views here.
 class RoomsInfo:  # 监控器使用
     def __init__(self, rooms):
-        self.dic = {
-            "room_id": [0],
-            "state": [""],
-            "fan_speed": [""],
-            "current_temp": [0],
-            "fee": [0],
-            "target_temp": [0],
-            "fee_rate": [0]
-        }
+        self.dic = {}
         if rooms:
             for room in rooms:  # 从1号房开始
-                self.dic["room_id"].append(room.room_id)
-                self.dic["state"].append(state_ch[room.state])
-                self.dic["fan_speed"].append(speed_ch[room.fan_speed])
-                self.dic["current_temp"].append('%.2f' % room.current_temp)
-                self.dic["fee"].append('%.2f' % room.fee)
-                self.dic["target_temp"].append(room.target_temp)
-                self.dic["fee_rate"].append(room.fee_rate)
+                self.dic[room.room_id] = {}
+                self.dic[room.room_id]["cur_wind"]=speed_ch[room.fan_speed]
+                self.dic[room.room_id]["cur_tem"]='%.2f' % room.current_temp
+                self.dic[room.room_id]["target_tem"]=room.target_temp
+                self.dic[room.room_id]["air_condition"]=room.get_state_display()
+                # {'101': {'cur_wind': '中速', 'cur_tem': '10.40', 'target_tem': 22}}
+            
+        print(self.dic)
 
 
 class RoomBuffer:  # 房间数据缓存
@@ -165,7 +159,7 @@ def change_ac_state(request):
         new_state = '等待'
     elif room.state == 3:
         new_state = '关机'
-        room_b.on_flag[int(room_id)-100] = False
+        room_b.on_flag[int(room_id) - 100] = False
     if room.fan_speed == 1:
         wind = '低风'
     elif room.fan_speed == 2:
@@ -184,7 +178,7 @@ def close_ac(request):
     """把room对象从room_list中移除"""
     room_id = request.POST.get('room_id')
     room = scheduler.request_off(room_id)
-    room_b.on_flag[int(room_id)-100] = False
+    room_b.on_flag[int(room_id) - 100] = False
     room_state = '关机'
     context = {'room_state': room_state}
     return JsonResponse(context)
@@ -197,11 +191,12 @@ def change_temp_wind(request):
     wind_speed = int(request.POST.get('fan_speed'))
     # print(temp, type(temp))
     # 更新参数
-    if room_b.on_flag[int(room_id)-100]:
+    if room_b.on_flag[int(room_id) - 100]:
         scheduler.change_target_temp(room_id, temp)  # 改变room的target_temp属性，写入数据库
         scheduler.change_fan_speed(room_id, wind_speed)  # 改变room的fan_speed属性，写入数据库
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'fail'})
+
 
 # ============管理员===========
 def init(request):
@@ -228,7 +223,7 @@ def init_submit(request):
 def monitor(request):
     rooms = scheduler.check_room_state()
     # print(rooms)
-    return render(request, 'monitor.html', RoomsInfo(rooms).dic)
+    return render(request, 'manager_air.html', {'status':RoomsInfo(rooms).dic})
 
 
 class Bills:
@@ -326,17 +321,17 @@ class Bills:
         rdr = Bills.get_details(room_id)
         # 文件头，一般就是数据名
         file_header = ["room_id",
-                    "request_time",
-                    "server_begin_time",
-                    "server_over_time",
-                    "serve_time",
-                    "fan_speed",
-                    "fee_rate",
-                    "fee"]
-
+                       "request_time",
+                       "server_begin_time",
+                       "server_over_time",
+                       "serve_time",
+                       "fan_speed",
+                       "fee_rate",
+                       "fee"]
+        print("room_id", room_id)
         # 写入数据，如果没有文件夹就创建一个
         os.makedirs(report_saving_path, exist_ok=True)
-        with open(report_saving_path+"/{}.csv".format(room_id), "w") as csvFile:
+        with open(report_saving_path + "/{}.csv".format(room_id), "w") as csvFile:
             writer = csv.DictWriter(csvFile, file_header)
             writer.writeheader()
             # 写入的内容都是以列表的形式传入函数
@@ -415,7 +410,7 @@ class Reports:
         if current_record:
             status = {}
             status['cur_tem'] = current_record.current_temp
-            status['cur_wind'] = current_record.fan_speed
+            status['cur_wind'] = current_record.get_fan_speed_display()
             status['target_tem'] = current_record.target_temp
             status['air_condition'] = current_record.get_state_display()
         else:
@@ -471,21 +466,41 @@ class Reports:
         # 打印所有房间号
         for room_id in all_room_ids:
             home_status[room_id] = Reports.current_front(room_id)
-        print({'home_status': home_status})
-        return render(request, 'manager_system.html',{'status':home_status})
+        return render(request, 'manager_system.html', {'status': home_status})
+
+    # @staticmethod
+    # def download_file(request):
+    #     room_id='101'
+    #     Bills.print_details(room_id)
+    #     file_name = '{}.csv'.format(room_id)
+
+    #     with open(report_saving_path, 'rb') as fh:
+    #         response = HttpResponse(fh.read(), content_type="application/octet-stream")
+    #         response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_name)
+    #         return response
 
     @staticmethod
     def download_file(request):
-        room_id='101'
+        room_id = request.GET.get('room_id', '')  # 获取传递的 room_id 参数
         Bills.print_details(room_id)
-        file_name = '{}.jpg'.format(room_id)
+        file_name = '{}.csv'.format(room_id)
+        csv_file_path = os.path.join(report_saving_path, file_name)
 
-        with open(report_saving_path, 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type="application/octet-stream")
-            response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_name)
+        with open(csv_file_path, 'r', newline='', encoding='utf-8') as csv_file:
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+
+            # 使用 csv 模块的 DictReader 读取 CSV 文件
+            csv_reader = csv.DictReader(csv_file)
+
+            # 创建 CSV 写入器并将数据写入 HttpResponse
+            csv_writer = csv.writer(response)
+            csv_writer.writerow(csv_reader.fieldnames)  # 写入 CSV 头部
+
+            for row in csv_reader:
+                csv_writer.writerow(row.values())
+
             return response
-
-
 
 # conda activate django_env
 # python manage.py runserver

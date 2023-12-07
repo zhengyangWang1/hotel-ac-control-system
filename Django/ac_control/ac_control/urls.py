@@ -31,7 +31,7 @@ from manager import views as manager_views
 urlpatterns = [
 
     path('', include("user.urls")),
-    path('manager/', include("manager.urls")),
+    path('manager/', include("manager.urls", namespace='manager')),
     path('', user_views.login, name='login'),  # 将根路径映射到登录页面
 
     # 客户
@@ -44,5 +44,5 @@ urlpatterns = [
     path('init/', user_views.init),
     path('init_submit/', user_views.init_submit),
     path('monitor/', user_views.monitor),
-
+    path('login_manager/',manager_views.login_manager)
 ]

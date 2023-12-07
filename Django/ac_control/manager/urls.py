@@ -5,13 +5,17 @@ from manager import views
 import user
 
 # from ..user import是从当前文件位置
-
+app_name='manager'
 urlpatterns = [
     # 管理员端
     path('', views.login),
+    path('register_manager/',views.registration_manager,name='register_manager'),
+    path('login_manager/',views.login_manager,name='login_manager'),
+    path('monitor/',user.views.monitor,name='monitor'),
+
     # path('register_manager/',views.registration_manager),
     # path('login_manager/',views.login_manager),
-    path('monitor/',user.views.Reports.get_current_report),
-    path('front/',user.views.Reports.front),
+
+    path('front/',user.views.Reports.front,name='front'),
     path('download/',user.views.Reports.download_file),
 ]

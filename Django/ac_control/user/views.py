@@ -17,13 +17,14 @@ from django.http import HttpResponse
 
 report_saving_path = 'E:/report'
 
+
 # Create your views here.
 class RoomsInfo:  # 监控器使用
     def __init__(self, rooms):
         self.dic = {}
         if rooms:
             for room in rooms:  # 从1号房开始
-                self.dic[room.room_id]={}
+                self.dic[room.room_id] = {}
                 self.dic[room.room_id]["cur_wind"].append(speed_ch[room.fan_speed])
                 self.dic[room.room_id]["cur_tem"].append('%.2f' % room.current_temp)
                 self.dic[room.room_id]["target_tem"].append(room.target_temp)
@@ -41,7 +42,7 @@ room_b = RoomBuffer
 speed_ch = ["", "高速", "中速", "低速"]
 state_ch = ["", "服务中", "等待", "关机", "休眠"]
 
-# # ===========暂时直接执行，需要时通过管理员执行===========
+# ===========暂时直接执行，需要时通过管理员执行===========
 scheduler = Scheduler()  # 创建一个调度器
 
 high = 25
@@ -154,7 +155,7 @@ def change_ac_state(request):
         new_state = '等待'
     elif room.state == 3:
         new_state = '关机'
-        room_b.on_flag[int(room_id)-100] = False
+        room_b.on_flag[int(room_id) - 100] = False
     if room.fan_speed == 1:
         wind = '低风'
     elif room.fan_speed == 2:
@@ -173,7 +174,7 @@ def close_ac(request):
     """把room对象从room_list中移除"""
     room_id = request.POST.get('room_id')
     room = scheduler.request_off(room_id)
-    room_b.on_flag[int(room_id)-100] = False
+    room_b.on_flag[int(room_id) - 100] = False
     room_state = '关机'
     context = {'room_state': room_state}
     return JsonResponse(context)
@@ -186,11 +187,12 @@ def change_temp_wind(request):
     wind_speed = int(request.POST.get('fan_speed'))
     print(temp, type(temp))
     # 更新参数
-    if room_b.on_flag[int(room_id)-100]:
+    if room_b.on_flag[int(room_id) - 100]:
         scheduler.change_target_temp(room_id, temp)  # 改变room的target_temp属性，写入数据库
         scheduler.change_fan_speed(room_id, wind_speed)  # 改变room的fan_speed属性，写入数据库
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'fail'})
+
 
 # ============管理员===========
 def init(request):
@@ -315,17 +317,17 @@ class Bills:
         rdr = Bills.get_details(room_id)
         # 文件头，一般就是数据名
         file_header = ["room_id",
-                    "request_time",
-                    "server_begin_time",
-                    "server_over_time",
-                    "serve_time",
-                    "fan_speed",
-                    "fee_rate",
-                    "fee"]
-        print("room_id",room_id)
+                       "request_time",
+                       "server_begin_time",
+                       "server_over_time",
+                       "serve_time",
+                       "fan_speed",
+                       "fee_rate",
+                       "fee"]
+        print("room_id", room_id)
         # 写入数据，如果没有文件夹就创建一个
         os.makedirs(report_saving_path, exist_ok=True)
-        with open(report_saving_path+"/{}.csv".format(room_id), "w") as csvFile:
+        with open(report_saving_path + "/{}.csv".format(room_id), "w") as csvFile:
             writer = csv.DictWriter(csvFile, file_header)
             writer.writeheader()
             # 写入的内容都是以列表的形式传入函数
@@ -460,7 +462,7 @@ class Reports:
         # 打印所有房间号
         for room_id in all_room_ids:
             home_status[room_id] = Reports.current_front(room_id)
-        return render(request, 'manager_system.html',{'status':home_status})
+        return render(request, 'manager_system.html', {'status': home_status})
 
     # @staticmethod
     # def download_file(request):
@@ -486,7 +488,7 @@ class Reports:
 
             # 使用 csv 模块的 DictReader 读取 CSV 文件
             csv_reader = csv.DictReader(csv_file)
-            
+
             # 创建 CSV 写入器并将数据写入 HttpResponse
             csv_writer = csv.writer(response)
             csv_writer.writerow(csv_reader.fieldnames)  # 写入 CSV 头部
@@ -495,8 +497,6 @@ class Reports:
                 csv_writer.writerow(row.values())
 
             return response
-
-
 
 # conda activate django_env
 # python manage.py runserver

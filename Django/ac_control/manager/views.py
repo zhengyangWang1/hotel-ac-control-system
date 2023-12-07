@@ -85,14 +85,14 @@ class ServingQueue(Queue):
         if mode == 1:
             for room in self.room_list:
                 if room.fan_speed == 3:
-                    room.current_temp += 0.1
+                    room.current_temp += 0.05
                     room.fee += 0.1
                 elif room.fan_speed == 2:
                     room.current_temp += 0.05
                     room.fee += 0.05
                 else:
-                    room.current_temp += 1 / 30
-                    room.fee = room.fee + 0.03
+                    room.current_temp += 0.05
+                    room.fee = room.fee + 1/30
                 # print(room.current_temp)
             timer = Timer(1, self.auto_update_fee, [1])
             timer.start()
@@ -348,6 +348,7 @@ class Scheduler(View):  # 在views里直接创建
 
         # 开启调度函数
         self.scheduling()
+        self.sup_print()
         #  只要有服务就检查是否有房间达到目标温度
         self.check_target_arrive()
         # 开启调度队列和等待队列的计时功能
@@ -385,7 +386,7 @@ class Scheduler(View):  # 在views里直接创建
                     # print(room.current_temp)
                     # print(room.init_temp)
                     room.current_temp -= 0.05
-                timer = threading.Timer(0.1, self.back_temp, [room, 1])  # 每1秒执行一次函数
+                timer = threading.Timer(1, self.back_temp, [room, 1])  # 每1秒执行一次函数
                 timer.start()
 
     def scheduling(self):
@@ -403,6 +404,13 @@ class Scheduler(View):  # 在views里直接创建
         elif len(self.WQ.room_list) != 0 and len(self.SQ.room_list) == 3:
             self.priority_scheduling()
             self.time_slice_scheduling()
+
+        # print("服务队列:")
+        # for room in self.SQ.room_list:
+        #     print(room.room_id)
+        # print("等待队列:")
+        # for room in self.WQ.room_list:
+        #     print(room.room_id)
         #     request_room = self.WQ.room_list[0]
         #
         #     # 优先级调度启动
@@ -422,6 +430,17 @@ class Scheduler(View):  # 在views里直接创建
         #
         timer = threading.Timer(1, self.scheduling)  # 每2min执行一次调度函数
         timer.start()
+
+    def sup_print(self):
+        print("服务队列:")
+        for room in self.SQ.room_list:
+            print(room.room_id)
+        print("等待队列:")
+        for room in self.WQ.room_list:
+            print(room.room_id)
+        timer = threading.Timer(5, self.sup_print)
+        timer.start()
+
 
     # 优先级调度
     def priority_scheduling(self):
@@ -452,7 +471,7 @@ class Scheduler(View):  # 在views里直接创建
                 available_room2 = [room for room in self.SQ.room_list if room.fan_speed == r.fan_speed]
                 if available_room2:
                     # 没有服务状态变化，释放服务队列中服务时长最大的服务对象
-                    max_serve_time_room = max(self.SQ.room_list, key=lambda x: x.serve_time)
+                    max_serve_time_room = max(available_room2, key=lambda x: x.serve_time)
                     self.SQ.delete(max_serve_time_room)
                     self.WQ.delete(r)
                     self.SQ.insert(r)

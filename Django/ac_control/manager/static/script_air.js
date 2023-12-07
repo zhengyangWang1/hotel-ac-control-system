@@ -75,6 +75,35 @@ function openCity(evt, cityName) {
 }
 
 setInterval(function() {
-    // 这里是您的刷新逻辑
-    // 例如，重新请求数据并更新页面元素
-  }, 1000); // 5000毫秒，即5秒
+    location.reload();
+  }, 3000); // 1000 毫秒，即每隔1秒
+  
+
+// function updateRoomStatus() {
+//     fetch('/monitor-api')  // 替换为您的API端点
+//         .then(response => response.json())
+//         .then(data => {
+//             const status = data.status;
+//             let tbodyHTML = '';
+//             for (const room_id in status) {
+//                 const s = status[room_id];
+//                 tbodyHTML += `<tr>
+//                                 <td>${room_id}</td>
+//                                 <td>${s.air_condition}</td>
+//                                 <td>${s.cur_tem}</td>
+//                                 <td>${s.target_tem}</td>
+//                                 <td>${s.cur_wind}</td>
+//                                 <td>制热</td> <!-- 假设模式也是状态的一部分 -->
+//                                 <td>
+//                                     <button class="button-primary">维修</button>
+//                                     <!-- 可以添加其他按钮或操作 -->
+//                                 </td>
+//                               </tr>`;
+//             }
+//             document.querySelector('tbody').innerHTML = tbodyHTML;
+//         })
+//         .catch(error => console.error('Error:', error));
+// }
+
+// // 每隔一定时间（比如每秒）更新房间状态
+// setInterval(updateRoomStatus, 1000); // 每1000毫秒（1秒）执行一次

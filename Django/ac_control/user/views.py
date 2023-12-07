@@ -502,5 +502,13 @@ class Reports:
 
             return response
 
+
+# ============监控器===========
+
+# def monitor_api(request):
+#     rooms = scheduler.check_room_state()
+#     return JsonResponse({'status': RoomsInfo(rooms).dic})
+
+
 # conda activate django_env
 # python manage.py runserver

@@ -18,4 +18,5 @@ urlpatterns = [
 
     path('front/',user.views.Reports.front,name='front'),
     path('download/',user.views.Reports.download_file),
+    # path('monitor-api/', user.views.monitor_api, name='monitor-api'),  # 添加这一行
 ]

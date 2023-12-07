@@ -25,9 +25,12 @@ class RoomsInfo:  # 监控器使用
         if rooms:
             for room in rooms:  # 从1号房开始
                 self.dic[room.room_id] = {}
-                self.dic[room.room_id]["cur_wind"].append(speed_ch[room.fan_speed])
-                self.dic[room.room_id]["cur_tem"].append('%.2f' % room.current_temp)
-                self.dic[room.room_id]["target_tem"].append(room.target_temp)
+                self.dic[room.room_id]["cur_wind"]=speed_ch[room.fan_speed]
+                self.dic[room.room_id]["cur_tem"]='%.2f' % room.current_temp
+                self.dic[room.room_id]["target_tem"]=room.target_temp
+                self.dic[room.room_id]["air_condition"]=room.get_state_display()
+                # {'101': {'cur_wind': '中速', 'cur_tem': '10.40', 'target_tem': 22}}
+            
         print(self.dic)
 
 
@@ -219,7 +222,7 @@ def init_submit(request):
 def monitor(request):
     rooms = scheduler.check_room_state()
     # print(rooms)
-    return render(request, 'monitor.html', RoomsInfo(rooms).dic)
+    return render(request, 'manager_air.html', {'status':RoomsInfo(rooms).dic})
 
 
 class Bills:

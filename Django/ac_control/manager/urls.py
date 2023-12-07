@@ -11,11 +11,11 @@ urlpatterns = [
     path('', views.login),
     path('register_manager/',views.registration_manager,name='register_manager'),
     path('login_manager/',views.login_manager,name='login_manager'),
-    path('monitor/',user.views.Reports.get_current_report,name='monitor'),
+    path('monitor/',user.views.monitor,name='monitor'),
 
     # path('register_manager/',views.registration_manager),
     # path('login_manager/',views.login_manager),
 
     path('front/',user.views.Reports.front,name='front'),
-    path('download/',user.views.monitor),
+    path('download/',user.views.Reports.download_file),
 ]

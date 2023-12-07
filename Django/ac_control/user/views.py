@@ -25,7 +25,7 @@ class RoomsInfo:  # 监控器使用
         if rooms:
             for room in rooms:  # 从1号房开始
                 self.dic[room.room_id] = {}
-                self.dic[room.room_id]["cur_wind"]=room.get_fan_speed_display
+                self.dic[room.room_id]["cur_wind"]=room.get_fan_speed_display()
                 self.dic[room.room_id]["cur_tem"]='%.2f' % room.current_temp
                 self.dic[room.room_id]["target_tem"]=room.target_temp
                 self.dic[room.room_id]["air_condition"]=room.get_state_display()
@@ -331,7 +331,9 @@ class Bills:
         print("room_id", room_id)
         # 写入数据，如果没有文件夹就创建一个
         os.makedirs(report_saving_path, exist_ok=True)
-        with open(report_saving_path + "/{}.csv".format(room_id), "w") as csvFile:
+        file_name = '{}.csv'.format(room_id)
+        csv_file_path = os.path.join(report_saving_path, file_name)
+        with open(csv_file_path, "w", newline='', encoding='gbk') as csvFile:
             writer = csv.DictWriter(csvFile, file_header)
             writer.writeheader()
             # 写入的内容都是以列表的形式传入函数
@@ -486,7 +488,7 @@ class Reports:
         file_name = '{}.csv'.format(room_id)
         csv_file_path = os.path.join(report_saving_path, file_name)
 
-        with open(csv_file_path, 'r', newline='', encoding='utf-8') as csv_file:
+        with open(csv_file_path, 'r', newline='', encoding='gbk') as csv_file:
             response = HttpResponse(content_type='text/csv')
             response['Content-Disposition'] = f'attachment; filename="{file_name}"'
 
@@ -501,6 +503,14 @@ class Reports:
                 csv_writer.writerow(row.values())
 
             return response
+
+
+# ============监控器===========
+
+# def monitor_api(request):
+#     rooms = scheduler.check_room_state()
+#     return JsonResponse({'status': RoomsInfo(rooms).dic})
+
 
 # conda activate django_env
 # python manage.py runserver

@@ -109,3 +109,7 @@ function downloadFile(room_id) {
 }
 
 
+setInterval(function() {
+    location.reload();
+  }, 3000); // 1000 毫秒，即每隔1秒
+  

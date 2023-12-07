@@ -25,16 +25,19 @@ class RoomsInfo:  # 监控器使用
         if rooms:
             for room in rooms:  # 从1号房开始
                 self.dic[room.room_id] = {}
-                self.dic[room.room_id]["cur_wind"].append(speed_ch[room.fan_speed])
-                self.dic[room.room_id]["cur_tem"].append('%.2f' % room.current_temp)
-                self.dic[room.room_id]["target_tem"].append(room.target_temp)
+                self.dic[room.room_id]["cur_wind"]=speed_ch[room.fan_speed]
+                self.dic[room.room_id]["cur_tem"]='%.2f' % room.current_temp
+                self.dic[room.room_id]["target_tem"]=room.target_temp
+                self.dic[room.room_id]["air_condition"]=room.get_state_display()
+                # {'101': {'cur_wind': '中速', 'cur_tem': '10.40', 'target_tem': 22}}
+            
         print(self.dic)
 
 
 class RoomBuffer:  # 房间数据缓存
     on_flag = [None, False, False, False, False, False]
-    target_temp = [0, 25, 25, 25, 25, 25]  # 不要用数组。。。。
-    init_temp = [0, 32, 28, 30, 29, 35]
+    target_temp = [0, 22, 22, 22, 22, 22]  # 不要用数组。。。。
+    init_temp = [0, 10, 15, 18, 12, 14]
 
 
 # ============静态变量===========
@@ -109,6 +112,7 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
         init_temp = 12
     else:
         init_temp = 14
+    room_state = '关机'
     if not room_b.on_flag[int(room_id) - 100]:
         room_b.on_flag[int(room_id) - 100] = True  # 开机
         room = scheduler.request_on(room_id, user_id, init_temp)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
@@ -185,7 +189,7 @@ def change_temp_wind(request):
     room_id = request.POST.get('room_id')
     temp = int(request.POST.get('temperature'))  # 前端传来时为str，需要转化为int
     wind_speed = int(request.POST.get('fan_speed'))
-    print(temp, type(temp))
+    # print(temp, type(temp))
     # 更新参数
     if room_b.on_flag[int(room_id) - 100]:
         scheduler.change_target_temp(room_id, temp)  # 改变room的target_temp属性，写入数据库
@@ -219,7 +223,7 @@ def init_submit(request):
 def monitor(request):
     rooms = scheduler.check_room_state()
     # print(rooms)
-    return render(request, 'monitor.html', RoomsInfo(rooms).dic)
+    return render(request, 'manager_air.html', {'status':RoomsInfo(rooms).dic})
 
 
 class Bills:
@@ -406,7 +410,7 @@ class Reports:
         if current_record:
             status = {}
             status['cur_tem'] = current_record.current_temp
-            status['cur_wind'] = current_record.fan_speed
+            status['cur_wind'] = current_record.get_fan_speed_display()
             status['target_tem'] = current_record.target_temp
             status['air_condition'] = current_record.get_state_display()
         else:

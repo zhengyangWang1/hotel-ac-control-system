@@ -41,16 +41,16 @@ class User(models.Model):
 class Room(models.Model):
     # 风速范围
     FAN_SPEED = [
-        (3, "HIGH"),
-        (2, "MIDDLE"),
-        (1, "LOW"),
+        (3, "高"),
+        (2, "中"),
+        (1, "低"),
     ]
     # 房间状态
     ROOM_STATE = [
-        (1, "SERVING"),
-        (2, "WAITING"),
-        (3, "SHUTDOWN"),
-        (4, "BACKING")  # 休眠
+        (1, "服务"),
+        (2, "等待"),
+        (3, "关机"),
+        (4, "休眠")  # 休眠
     ]
     # 新的详单记录产生条件
     OPERATION_CHOICE = [

@@ -15,29 +15,19 @@ import os
 import json
 from django.http import HttpResponse
 
-report_saving_path = 'D:/report'
+report_saving_path = 'E:/report'
 
 # Create your views here.
 class RoomsInfo:  # 监控器使用
     def __init__(self, rooms):
-        self.dic = {
-            "room_id": [0],
-            "state": [""],
-            "fan_speed": [""],
-            "current_temp": [0],
-            "fee": [0],
-            "target_temp": [0],
-            "fee_rate": [0]
-        }
+        self.dic = {}
         if rooms:
             for room in rooms:  # 从1号房开始
-                self.dic["room_id"].append(room.room_id)
-                self.dic["state"].append(state_ch[room.state])
-                self.dic["fan_speed"].append(speed_ch[room.fan_speed])
-                self.dic["current_temp"].append('%.2f' % room.current_temp)
-                self.dic["fee"].append('%.2f' % room.fee)
-                self.dic["target_temp"].append(room.target_temp)
-                self.dic["fee_rate"].append(room.fee_rate)
+                self.dic[room.room_id]={}
+                self.dic[room.room_id]["cur_wind"].append(speed_ch[room.fan_speed])
+                self.dic[room.room_id]["cur_tem"].append('%.2f' % room.current_temp)
+                self.dic[room.room_id]["target_tem"].append(room.target_temp)
+        print(self.dic)
 
 
 class RoomBuffer:  # 房间数据缓存
@@ -51,7 +41,7 @@ room_b = RoomBuffer
 speed_ch = ["", "高速", "中速", "低速"]
 state_ch = ["", "服务中", "等待", "关机", "休眠"]
 
-# ===========暂时直接执行，需要时通过管理员执行===========
+# # ===========暂时直接执行，需要时通过管理员执行===========
 scheduler = Scheduler()  # 创建一个调度器
 
 high = 25
@@ -332,7 +322,7 @@ class Bills:
                     "fan_speed",
                     "fee_rate",
                     "fee"]
-
+        print("room_id",room_id)
         # 写入数据，如果没有文件夹就创建一个
         os.makedirs(report_saving_path, exist_ok=True)
         with open(report_saving_path+"/{}.csv".format(room_id), "w") as csvFile:
@@ -470,18 +460,40 @@ class Reports:
         # 打印所有房间号
         for room_id in all_room_ids:
             home_status[room_id] = Reports.current_front(room_id)
-        print({'home_status': home_status})
         return render(request, 'manager_system.html',{'status':home_status})
+
+    # @staticmethod
+    # def download_file(request):
+    #     room_id='101'
+    #     Bills.print_details(room_id)
+    #     file_name = '{}.csv'.format(room_id)
+
+    #     with open(report_saving_path, 'rb') as fh:
+    #         response = HttpResponse(fh.read(), content_type="application/octet-stream")
+    #         response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_name)
+    #         return response
 
     @staticmethod
     def download_file(request):
-        room_id='101'
+        room_id = request.GET.get('room_id', '')  # 获取传递的 room_id 参数
         Bills.print_details(room_id)
-        file_name = '{}.jpg'.format(room_id)
+        file_name = '{}.csv'.format(room_id)
+        csv_file_path = os.path.join(report_saving_path, file_name)
 
-        with open(report_saving_path, 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type="application/octet-stream")
-            response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_name)
+        with open(csv_file_path, 'r', newline='', encoding='utf-8') as csv_file:
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+
+            # 使用 csv 模块的 DictReader 读取 CSV 文件
+            csv_reader = csv.DictReader(csv_file)
+            
+            # 创建 CSV 写入器并将数据写入 HttpResponse
+            csv_writer = csv.writer(response)
+            csv_writer.writerow(csv_reader.fieldnames)  # 写入 CSV 头部
+
+            for row in csv_reader:
+                csv_writer.writerow(row.values())
+
             return response
 
 

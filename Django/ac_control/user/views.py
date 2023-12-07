@@ -36,8 +36,8 @@ class RoomsInfo:  # 监控器使用
 
 class RoomBuffer:  # 房间数据缓存
     on_flag = [None, False, False, False, False, False]
-    target_temp = [0, 25, 25, 25, 25, 25]  # 不要用数组。。。。
-    init_temp = [0, 32, 28, 30, 29, 35]
+    target_temp = [0, 22, 22, 22, 22, 22]  # 不要用数组。。。。
+    init_temp = [0, 10, 15, 18, 12, 14]
 
 
 # ============静态变量===========
@@ -112,6 +112,7 @@ def open_ac(request):  # 在点击开启空调后执行： 加入调度队列-->
         init_temp = 12
     else:
         init_temp = 14
+    room_state = '关机'
     if not room_b.on_flag[int(room_id) - 100]:
         room_b.on_flag[int(room_id) - 100] = True  # 开机
         room = scheduler.request_on(room_id, user_id, init_temp)  # 加入调度队列，返回一个房间对象，包含状态（1：服务，2：等待）
@@ -188,7 +189,7 @@ def change_temp_wind(request):
     room_id = request.POST.get('room_id')
     temp = int(request.POST.get('temperature'))  # 前端传来时为str，需要转化为int
     wind_speed = int(request.POST.get('fan_speed'))
-    print(temp, type(temp))
+    # print(temp, type(temp))
     # 更新参数
     if room_b.on_flag[int(room_id) - 100]:
         scheduler.change_target_temp(room_id, temp)  # 改变room的target_temp属性，写入数据库

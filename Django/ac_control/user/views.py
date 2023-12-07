@@ -15,7 +15,7 @@ import os
 import json
 from django.http import HttpResponse
 
-report_saving_path = 'E:/report'
+report_saving_path = 'details/'
 
 
 # Create your views here.

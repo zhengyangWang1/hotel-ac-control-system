@@ -9,9 +9,9 @@ app_name='manager'
 urlpatterns = [
     # 管理员端
     path('', views.login),
-    path('register_manager/',views.registration_manager,name='register_manager'),
-    path('login_manager/',views.login_manager,name='login_manager'),
-    path('monitor/',user.views.monitor,name='monitor'),
+    path('register_manager/', views.registration_manager,name='register_manager'),
+    path('login_manager/', views.login_manager,name='login_manager'),
+    path('monitor/', user.views.monitor,name='monitor'),
 
     # path('register_manager/',views.registration_manager),
     # path('login_manager/',views.login_manager),

@@ -13,8 +13,6 @@ from django.utils import timezone
 from django.views import View
 from threading import Timer
 from user.models import Room
-from manager.models import Manager
-from django.http import JsonResponse
 
 
 # import numpy as np
@@ -330,7 +328,7 @@ class Scheduler(View):  # 在views里直接创建
         '''
         更新self.rooms
         '''
-        timer = threading.Timer(5, self.check_room_state)  # 每五秒执行一次check函数,list_room为参数
+        timer = threading.Timer(1, self.check_room_state)  # 每五秒执行一次check函数,list_room为参数
         timer.start()
         return self.rooms
 
@@ -413,7 +411,6 @@ class Scheduler(View):  # 在views里直接创建
         # print("等待队列:")
         # for room in self.WQ.room_list:
         #     print(room.room_id)
-
         #     request_room = self.WQ.room_list[0]
         #
         #     # 优先级调度启动
@@ -512,31 +509,3 @@ class Scheduler(View):  # 在views里直接创建
 
 def login(request):
     return render(request, 'manager_login.html')
-
-
-def login_manager(request):
-    if request.method == 'POST':
-        manager_type = request.POST.get('identity1')
-        manager_name = request.POST.get('username1')
-        manager_password = request.POST.get('password1')
-        try:
-            manager = Manager.objects.get(manager_type=manager_type, manager_name=manager_name,
-                                          password=manager_password)
-            if manager_type == 'air_service':
-                return redirect('manager:monitor')
-            else:
-                return redirect('manager:front')
-
-        except Manager.DoesNotExist:
-            # 如果用户不存在或密码不匹配，返回登录页面或其他提示页面
-            return JsonResponse('登陆失败')
-    return render(request, 'manager_login.html')
-
-
-def registration_manager(request):
-    if request.method == 'POST':
-        manager_type = request.POST.get('identity')
-        manager_name = request.POST.get('username')
-        manager_password = request.POST.get('password')
-        Manager.objects.create(manager_type=manager_type, manager_name=manager_name, password=manager_password)
-        return render(request, 'manager_login.html')

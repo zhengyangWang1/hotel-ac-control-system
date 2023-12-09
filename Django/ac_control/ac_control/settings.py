@@ -89,7 +89,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "Django",  # 数据库名字
         "USER": 'root',  # 用户名
-        'PASSWORD': '030530',
+        'PASSWORD': '',
 
         'HOST': '127.0.0.1',  # 主机
         'PORT': '3306',

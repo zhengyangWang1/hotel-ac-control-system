@@ -1,61 +1,45 @@
-# hotel-ac-control-system 酒店空调管理系统
-### SE小组作业
+# README
 
-### 前端
-user部分
+choose another language：
 
-1.登录注册（已实现）
+- zh_CN [简体中文](readme/README_ch.md)
 
-2.toggleAC()函数，执行空调开机关机功能，在空调开机后，取消调节温度风速的控件的禁用。（已实现）
-
-3.updateStatus()函数，每隔30s从后端获取空调状态，当前温度、当前风速、当前费用、累积费用，更新前端界面。（已实现）
-
-manager部分
-- [ ] monitor界面需要手动刷新，否则新加入的房间显示不出来
-- [ ] monitor界面当前温度无法与用户端做到同步
-- [ ] monitor界面空调状态和当前风速希望用汉字来表示，而非英文和数字
-- [ ] front界面费用无法实时更新，且需要改为保留两位小数
+# hotel-ac-control-system
+Django full stack frame
 
 
-1.登录注册（已实现）
+## project architecture
+- air conditioning control interface
+Main features:
+- user registration and login
+- control the opening and closing of the air conditioner, and change the air speed and temperature of the air conditioner.
+- display current room temperature, target temperature, cost, and wind speed
+- air conditioning monitoring interface
+Main features:
+- display the air conditioning status of each room, including temperature, wind speed and cost
+- front desk interface
+Main features:
+- download the air conditioning usage list (CSV file) for each room
+## project background
+Bupt Cheap Hotel is located in College Station City, outside the fifth ring road of the capital. The hotel was founded in 2000, after 10 years of operation has accumulated a good reputation, in order to respond to the government's concept of green business, expected to build air-conditioning temperature control billing system: advocating the use of more pay, less pay, do Not Pay the bill model, cost-saving at the same time so that customers can always see the amount spent, to achieve a number of savings in mind, further attracting young people to stay. The hotel has a total of 5 rooms, but due to free resources, a maximum of 3 rooms open air conditioning.
+## backend implementation
+Scheduling strategy
+The basic scheduling strategy is: Priority Scheduling + time slice scheduling. The priority scheduling is based on the requested wind speed, so the priority strategy should be considered first
+1) when the number of service objects is less than the maximum number of service objects, all requests will be assigned a service object;
+2) when the number of service objects is greater than or equal to the upper limit of service objects, start the scheduling policy: first, determine whether the priority policy is satisfied; the wind speed of the requested service and the wind speed of the service objects:
+-2.1. If the decision = is greater than, the priority scheduling policy is initiated, and several service objects are judged to have a lower wind speed than the request wind speed:
+-2.1.1 if there is only one, the room is placed in a waiting queue and assigned a waiting service time: the service object is released and assigned to a new request object;
+- 2.1.2 if more than one service object has the same wind speed and is lower than the requesting object, the service object with the longest service time is released and assigned to the new requesting object, and the room is placed in the waiting queue, and allocating a waiting time;
+- 2.1.3 if the wind speed of more than one service object is lower than the requested wind speed and the wind speed is not equal, the service object with the lowest wind speed is released, and the room is placed in a waiting queue and assigned a waiting service time;
+-2.2 if judgment = equal, the timeslice scheduling policy is started
+- 2.2.1 place the request object in a wait queue and allocate a wait service time;
+- 2.2.2 during these two minutes, if there is no change in the service state, the service object with the longest service time in the service queue is released when the wait time = 0 and the room is placed in the wait queue, and is assigned a waiting service time: The Waiting Service object is assigned a service object to start the service;
+-2.2.3 during this two-minute wait, if the target temperature of any service object reaches or shuts down (which means the service object is released) , the object with the least waiting time in the waiting queue gets the service object
+-2.3 if the judgment = is less than, the request object must wait until a service object is idle before it is available
 
-2.当有客户办理入住进入房间时，在空调管理员界面的表格中增添一条新的房间、空调记录。每隔一段时间更新空调状态，房间账单状态（未实现）
+## Services.
+A rebound strategy
+Air-conditioning adjustable temperature range 18-25, open air-conditioning every minute heating 0.5 degrees, when the air-conditioning waiting for service, the room temperature unchanged. When the air conditioner is turned off, the room temperature drops by 0.5 degrees per minute until it reaches the initial temperature.
 
-3.添加下载详单按钮，从后端获取详单表格。（未实现）
-#### 用户端
-
-
-- [ x ] 从后端用{{ }}接收空调的状态
-- [ x ] 用户更改温度和风速，提交form表单，包括(room_id, temp, wind_speed)
-- [ x ] 开关空调的按钮，点击后执行对应函数，修改toggleAC()来实现，需要把room_id传给后端
-
-#### 服务端
-
-### views
-#### 用户端
-
-等待和服务队列中的room对象都是数据库中的数据，可以在views中查询更改
-
-register函数：在用户点击办理入住时执行，将用户添加到数据库中的user表
-
-login函数：返回login页面，在程序运行后立即执行
-
-login_room函数：在用户点击进入房间，输入正确的id和密码时执行，转至tem_c2页面
-
-open_ac函数：用户点击开机后执行，创建room对象，将空调加入调度队列，给前端返回空调状态
-
-change_ac_state函数：空调有四个状态（1：服务，2：等待，3：关机，4：休眠），前端用js函数每秒轮询空调状态时执行该函数，函数把空调状态反馈给前端
-
-change_temp_wind函数：用户更改风速和温度后点击确定，发送post请求到后端，执行该函数，更改Room表中的数据
-
-close_ac函数：用户点击关机后执行，将空调从调度队列移除
-
-
-#### 服务端
-
-
-### 调度系统
-
-- [ x ] 搞清楚调度队列中的对象是不是数据库中的表，是不是一条数据代表一个房间（在实现时发现一条数据一个房间是很有必要的）
-
-### 打印账单和详单
+## Billing strategy
+The rate is only related to wind speed. High winds are 1 yuan per minute, strokes are 0.5 yuan per minute, and low winds are 1/3 yuan per minute.

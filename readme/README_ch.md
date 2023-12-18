@@ -1,6 +1,7 @@
 # hotel-ac-control-system 酒店空调管理系统
 
 Django全栈框架
+Django==4.2.5
 
 ## 项目架构
 

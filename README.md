@@ -6,7 +6,7 @@ choose another language：
 
 # hotel-ac-control-system
 Django full stack frame
-
+Django==4.2.5
 
 ## project architecture
 - air conditioning control interface
